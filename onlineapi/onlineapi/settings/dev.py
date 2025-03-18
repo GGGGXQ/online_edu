@@ -123,3 +123,62 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {  # 详细格式，适合用于开发人员不在场的情况下的日志记录。
+            # 格式定义：https://docs.python.org/3/library/logging.html#logrecord-attributes
+            # levelname 日志等级
+            # asctime   发生时间
+            # module    文件名
+            # process   进程ID
+            # thread    线程ID
+            # message   异常信息
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',  # 变量格式分隔符
+        },
+        'simple': {  # 简单格式，适合用于开发人员在场的情况下的终端输出
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'filters': {  # 过滤器
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
+    'handlers': { # 日志处理流程，console或者mail_admins都是自定义的。
+        'console': {
+            'level': 'DEBUG', # 设置当前日志处理流程中的日志最低等级
+            'filters': ['require_debug_true'], # 当前日志处理流程的日志过滤
+            'class': 'logging.StreamHandler',  # 当前日志处理流程的核心类，StreamHandler可以帮我们把日志信息输出到终端下
+            'formatter': 'simple'              # 当前日志处理流程的日志格式
+        },
+        # 'mail_admins': {
+        #     'level': 'ERROR',                  # 设置当前日志处理流程中的日志最低等级
+        #     'class': 'django.utils.log.AdminEmailHandler',  # AdminEmailHandler可以帮我们把日志信息输出到管理员邮箱中。
+        #     'filters': ['special']             # 当前日志处理流程的日志过滤
+        # }
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            # 日志位置,日志文件名，日志保存目录logs必须手动创建
+            'filename': BASE_DIR.parent / "logs/luffycity.log",
+            # 单个日志文件的最大值，这里我们设置300M
+            'maxBytes': 300 * 1024 * 1024,
+            # 备份日志文件的数量，设置最大日志数量为10
+            'backupCount': 10,
+            # 日志格式:详细格式
+            'formatter': 'verbose'
+        },
+    },
+    'loggers': {  # 日志处理的命名空间
+        'django': {
+            'handlers': ['console','file'], # 当基于django命名空间写入日志时，调用那几个日志处理流程
+            'propagate': True,   # 是否在django命名空间对应的日志处理流程结束以后，冒泡通知其他的日志功能。True表示允许
+        },
+    }
+}
