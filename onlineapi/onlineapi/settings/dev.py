@@ -73,6 +73,7 @@ WSGI_APPLICATION = 'onlineapi.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+# 数据库配置
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -125,6 +126,7 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+# 日志配置
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -181,4 +183,10 @@ LOGGING = {
             'propagate': True,   # 是否在django命名空间对应的日志处理流程结束以后，冒泡通知其他的日志功能。True表示允许
         },
     }
+}
+
+# drf配置
+REST_FRAMEWORK = {
+    # 自定义异常处理
+    'EXCEPTION_HANDLER': 'onlineapi.utils.exceptions.custom_exception_handler',
 }
