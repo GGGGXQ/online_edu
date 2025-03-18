@@ -75,9 +75,25 @@ WSGI_APPLICATION = 'onlineapi.wsgi.application'
 
 # 数据库配置
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'db.sqlite3',
+    # }
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        # 'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'dj_db_conn_pool.backends.mysql',
+        'NAME': 'online',
+        'PORT': 3306,
+        'HOST': '127.0.0.1',
+        'USER': 'online_user',
+        'PASSWORD': 'online',
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+        },
+        'POOL_OPTIONS': {
+            'POOL_SIZE': 10,  # 连接池默认创建的链接对象的数量
+            'MAX_OVERFLOW': 10  # 连接池默认创建的链接对象的最大数量
+        }
     }
 }
 
