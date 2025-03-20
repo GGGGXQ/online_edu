@@ -2,6 +2,16 @@
 import Header from "../components/Header.vue"
 import Footer from "../components/Footer.vue"
 import {reactive} from "vue";
+
+// 测试CORS的跨域配置是否有问题
+import axios from "axios"
+const http = axios.create()
+
+// 测试服务端的跨域是否配置成功
+http.get("http://api.onlineedu.cn:8000/home/test").then(response=>{
+  console.log(response.data);
+})
+
 const store = reactive({
   value2: null,
   colors: ['#99A9BF', '#F7BA2A', '#FF9900'],
