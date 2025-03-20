@@ -19,9 +19,15 @@ logger = logging.getLogger('django')
 # Create your views here.
 class NavHeaderListAPIView(ListAPIView):
     serializer_class = NavModelSerializer
-    queryset = Nav.objects.filter(position=constants.NAV_HEADER_POSITION, is_show=True, is_deleted=False).ordered_by('orders', '-id')[:constants.NAV_HEADER_SIZE]
+    queryset = Nav.objects.filter(position=constants.NAV_HEADER_POSITION, is_show=True, is_deleted=False).order_by('orders', '-id')[:constants.NAV_HEADER_SIZE]
 
 
 class NavFooterListAPIView(ListAPIView):
     serializer_class = NavModelSerializer
-    queryset = Nav.objects.filter(position=constants.NAV_FOOTER_POSITION, is_show=True, is_deleted=False).ordered_by('orders', '-id')[:constants.NAV_FOOTER_SIZE]
+    queryset = Nav.objects.filter(position=constants.NAV_FOOTER_POSITION, is_show=True, is_deleted=False).order_by('orders', '-id')[:constants.NAV_FOOTER_SIZE]
+
+
+class BannerListAPIView(ListAPIView):
+    """轮播广告视图"""
+    serializer_class = NavModelSerializer
+    queryset = Nav.objects.filter(is_show=True, is_deleted=False).order_by('orders', '-id')[:constants.BANNER_SIZE]
