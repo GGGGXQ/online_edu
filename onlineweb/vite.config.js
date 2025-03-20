@@ -10,4 +10,9 @@ export default defineConfig({
         resolvers: [ElementPlusResolver()],
       }),
   ],
+    server: {
+    host: 'www.onlineedu.cn', // 指定主机名
+    port: 5173, // 指定端口
+  },
 });
+

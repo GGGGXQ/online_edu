@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-1nt3&-iiej@ppvyr-i)2qdg3=12z@l$4((ug44r7$q!ntx^58a
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 # Application definition
 
@@ -46,6 +46,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -54,6 +55,13 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# CORS的配置信息:
+# CORS_ORIGIN_WHITELIST = (
+#     'http://www.luffycity.cn:3000',
+# )
+# CORS_ALLOW_CREDENTIALS = False  # 不允许ajax跨域请求时携带cookie
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'onlineapi.urls'
 
