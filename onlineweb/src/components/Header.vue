@@ -6,11 +6,10 @@
             <router-link to="/"><img src="../assets/logo.svg" alt=""></router-link>
           </div>
           <ul class="nav">
-              <li><router-link to="">免费课</router-link></li>
-              <li><router-link to="">项目课</router-link></li>
-              <li><router-link to="">学位课</router-link></li>
-              <li><router-link to="">习题库</router-link></li>
-              <li><router-link to="">路飞学城</router-link></li>
+              <li v-for="nav in nav.header_nav_list">
+                <a :href="nav.link" v-if="nav.is_http">{{nav.name}}</a>
+                <router-link :to="nav.link" v-else>{{nav.name}}</router-link>
+              </li>
           </ul>
           <div class="search-warp">
             <div class="search-area">
@@ -40,6 +39,13 @@
 
 
 <script setup>
+import nav from "../api/nav";
+
+// 请求头部导航列表
+nav.get_header_nav().then(response=>{
+  nav.header_nav_list = response.data
+})
+
 
 </script>
 
