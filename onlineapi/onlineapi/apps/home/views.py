@@ -1,33 +1,22 @@
-from django.shortcuts import render
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework import status
-from django_redis import get_redis_connection
-from rest_framework.generics import ListAPIView
-
-from .models import Nav
-from .serializers import NavModelSerializer
+from .models import Nav, Banner
+from .serializers import NavModelSerializer, BannerModelSerializer
 
 import constants
-
-# 对日志调用
-import logging
-
-logger = logging.getLogger('django')
+from views import CacheListAPIView
 
 
 # Create your views here.
-class NavHeaderListAPIView(ListAPIView):
+class NavHeaderListAPIView(CacheListAPIView):
     serializer_class = NavModelSerializer
     queryset = Nav.objects.filter(position=constants.NAV_HEADER_POSITION, is_show=True, is_deleted=False).order_by('orders', '-id')[:constants.NAV_HEADER_SIZE]
 
 
-class NavFooterListAPIView(ListAPIView):
+class NavFooterListAPIView(CacheListAPIView):
     serializer_class = NavModelSerializer
     queryset = Nav.objects.filter(position=constants.NAV_FOOTER_POSITION, is_show=True, is_deleted=False).order_by('orders', '-id')[:constants.NAV_FOOTER_SIZE]
 
 
-class BannerListAPIView(ListAPIView):
+class BannerListAPIView(CacheListAPIView):
     """轮播广告视图"""
-    serializer_class = NavModelSerializer
-    queryset = Nav.objects.filter(is_show=True, is_deleted=False).order_by('orders', '-id')[:constants.BANNER_SIZE]
+    serializer_class = BannerModelSerializer
+    queryset = Banner.objects.filter(is_show=True, is_deleted=False).order_by('orders', '-id')[:constants.BANNER_SIZE]
