@@ -255,7 +255,7 @@
       <!-- 轮播图-->
       <div class="g-banner-content"  @mouseover="state.current_menu=-1">
         <el-carousel :interval="5000" arrow="always" height="482px" v-if="banner.banner_list[0]">
-          <el-carousel-item v-for="item,key in banner.banner_list" :key="key">
+          <el-carousel-item v-for="item in banner.banner_list" :key="item.key">
             <a :href="item.link" v-if="item.is_http"><img :src="item.image" alt="" style="width: 100%;height: 100%;"></a>
             <router-link :to="item.link" v-else><img :src="item.image" alt="" style="width: 100%;height: 100%;"></router-link>
           </el-carousel-item>

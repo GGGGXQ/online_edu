@@ -3,12 +3,12 @@
       <div class="header">
         <div class="content">
           <div class="logo">
-            <router-link to="/"><img src="../assets/logo.svg" alt=""></router-link>
+            <router-link to="/"><img src="../assets/logo.png" alt=""></router-link>
           </div>
           <ul class="nav">
-              <li v-for="nav in nav.header_nav_list">
-                <a :href="nav.link" v-if="nav.is_http">{{nav.name}}</a>
-                <router-link :to="nav.link" v-else>{{nav.name}}</router-link>
+              <li v-for="item in nav.header_nav_list">
+                <a :href="item.link" v-if="item.is_http">{{item.name}}</a>
+                <router-link :to="item.link" v-else>{{item.name}}</router-link>
               </li>
           </ul>
           <div class="search-warp">
@@ -27,7 +27,7 @@
               <span><router-link to="/cart">购物车</router-link></span>
             </div>
             <div class="login-box full-left">
-              <span>登录</span>
+              <span @click="state.show_login=true">登录</span>
               &nbsp;/&nbsp;
               <span>注册</span>
             </div>
@@ -35,16 +35,27 @@
         </div>
       </div>
     </div>
+    <el-dialog :width="600" v-model="state.show_login">
+      <Login></Login>
+    </el-dialog>
 </template>
 
 
 <script setup>
+import Login from "./Login.vue";
+import {reactive} from "vue";
 import nav from "../api/nav";
+
+const state = reactive({
+  show_login: false,
+})
 
 // 请求头部导航列表
 nav.get_header_nav().then(response=>{
   nav.header_nav_list = response.data
-})
+}).catch(error=>{
+  console.log(error);
+});
 
 
 </script>
