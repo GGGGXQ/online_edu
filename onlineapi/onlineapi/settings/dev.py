@@ -11,11 +11,12 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+import sys
+import datetime
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-import sys
 
 sys.path.insert(0, str(BASE_DIR / "apps"))
 sys.path.insert(0, str(BASE_DIR / "utils"))
@@ -155,7 +156,6 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
-
 MEDIA_ROOT = BASE_DIR / "uploads"
 MEDIA_URL = "/uploads/"
 
@@ -227,6 +227,25 @@ LOGGING = {
 REST_FRAMEWORK = {
     # 自定义异常处理
     'EXCEPTION_HANDLER': 'onlineapi.utils.exceptions.custom_exception_handler',
+    # 自定义认证
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',  # session认证
+        'rest_framework.authentication.BasicAuthentication',
+    ],
+}
+
+# jwt认证相关配置
+SIMPLE_JWT = {
+    # Access Token 有效期（通常较短）
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(minutes=60),  # 例如 60 分钟
+    # Refresh Token 有效期（通常较长）
+    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(weeks=1),  # 一周有效
+    'ROTATE_REFRESH_TOKENS': False,  # 是否在刷新时旋转 Refresh Token
+    'BLACKLIST_AFTER_ROTATION': False,  # 旋转后是否将旧 Token 列入黑名单
+    'ALGORITHM': 'HS256',  # 加密算法
+    'SIGNING_KEY': SECRET_KEY,  # 使用 Django 的 SECRET_KEY
+    'VERIFYING_KEY': None,
 }
 
 # redis配置
