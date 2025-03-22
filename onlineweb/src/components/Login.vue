@@ -29,6 +29,7 @@
 <script setup>
 import user from "../api/user";
 import { ElMessage } from 'element-plus'
+const emit = defineEmits(["successhandle",])
 
 // 登录处理
 const loginhandler = ()=>{
@@ -57,11 +58,17 @@ const loginhandler = ()=>{
       sessionStorage.access = response.data.access;
       sessionStorage.refresh = response.data.refresh;
     }
-    // 保存token，并根据用户的选择，是否记住密码
     // 成功提示
     ElMessage.success("登录成功！");
     console.log("登录成功！");
-    // 关闭登录弹窗
+    // 关闭登录弹窗，对外发送一个登录成功的信息
+    user.account = ""
+    user.password = ""
+    user.mobile = ""
+    user.code = ""
+    user.remember = false
+    emit("successhandle")
+
   }).catch(error=>{
     console.log(error);
   })
