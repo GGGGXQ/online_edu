@@ -4,11 +4,14 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
     TokenVerifyView,
 )
+
 from . import views
+from .views import CustomTokenObtainPairView
+
 
 urlpatterns = [
     # 登录视图，获取access_token和refresh_token
-    path("login/", TokenObtainPairView.as_view(), name="login"),
+    path("login/", CustomTokenObtainPairView.as_view(), name="login"),
     # 可选：刷新token视图，使用refresh_token生成新的access_token
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     # 可选：验证现有的access_token是否有效

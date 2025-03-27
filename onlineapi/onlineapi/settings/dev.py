@@ -238,14 +238,16 @@ REST_FRAMEWORK = {
 # jwt认证相关配置
 SIMPLE_JWT = {
     # Access Token 有效期（通常较短）
-    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(minutes=60),  # 例如 60 分钟
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(weeks=1),  # 例如 60 分钟
     # Refresh Token 有效期（通常较长）
-    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(weeks=1),  # 一周有效
+    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=30),  # 一周有效
     'ROTATE_REFRESH_TOKENS': False,  # 是否在刷新时旋转 Refresh Token
     'BLACKLIST_AFTER_ROTATION': False,  # 旋转后是否将旧 Token 列入黑名单
     'ALGORITHM': 'HS256',  # 加密算法
     'SIGNING_KEY': SECRET_KEY,  # 使用 Django 的 SECRET_KEY
     'VERIFYING_KEY': None,
+    # 'ACCESS_TOKEN_CLASS': 'authenticate.CustomAccessToken',
+    "TOKEN_OBTAIN_SERIALIZER": "authenticate.CustomTokenObtainPairSerializer",
 }
 
 # redis配置
