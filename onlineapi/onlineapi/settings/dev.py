@@ -184,6 +184,18 @@ LOGGING = {
             'format': '{levelname} {message}',
             'style': '{',
         },
+        'colored': {  # 新增彩色日志格式
+            '()': 'colorlog.ColoredFormatter',
+            'format': '%(log_color)s%(levelname)-8s%(reset)s %(blue)s%(message)s',
+            'log_colors': {
+                'DEBUG':    'cyan',
+                'INFO':     'green',
+                'WARNING': 'yellow',
+                'ERROR':   'red',
+                'CRITICAL': 'red,bg_white',
+            },
+            'style': '%'
+        }
     },
     'filters': {  # 过滤器
         'require_debug_true': {
@@ -195,7 +207,7 @@ LOGGING = {
             'level': 'DEBUG',  # 设置当前日志处理流程中的日志最低等级
             'filters': ['require_debug_true'],  # 当前日志处理流程的日志过滤
             'class': 'logging.StreamHandler',  # 当前日志处理流程的核心类，StreamHandler可以帮我们把日志信息输出到终端下
-            'formatter': 'simple'  # 当前日志处理流程的日志格式
+            'formatter': 'colored'  # 用彩色格式
         },
         # 'mail_admins': {
         #     'level': 'ERROR',                  # 设置当前日志处理流程中的日志最低等级
@@ -286,3 +298,6 @@ CACHES = {
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 # 设置session保存的位置对应的缓存配置项
 SESSION_CACHE_ALIAS = "session"
+
+# django自定义认证
+AUTHENTICATION_BACKENDS = ['onlineapi.utils.authenticate.CustomAuthBackend', ]

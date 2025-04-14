@@ -15,9 +15,12 @@
 <script setup>
 import Login from "../components/Login.vue"
 import router from "../router";
+import {ref} from 'vue';
 
+const showLoginDialog = ref(true)
 // 用户登录成功以后的处理
 const login_success = ()=>{
+  showLoginDialog.value = false // 关闭弹窗
   // 跳转到首页
   router.push("/");
 }

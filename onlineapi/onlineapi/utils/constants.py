@@ -11,3 +11,5 @@ NAV_FOOTER_SIZE = 10
 BANNER_SIZE = 10
 # 列表页数据的缓存周期， 单位：秒
 LIST_PAGE_CACHE_TIME = 60
+# 默认头像
+DEFAULT_USER_AVATAR = "avatar/2025/avatar.jpg"

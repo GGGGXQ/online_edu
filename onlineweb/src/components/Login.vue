@@ -14,15 +14,15 @@
       </label>
       <p>忘记密码</p>
     </div>
-    <button class="login_btn" @click="loginhandler">登录</button>
-    <p class="go_login" >没有账号 <span>立即注册</span></p>
+     <button class="login_btn" @click="show_captcha">登录</button>
+    <p class="go_login" >没有账号 <router-link to="/register">立即注册</router-link></p>
   </div>
   <div class="inp" v-show="user.login_type==1">
     <input v-model="user.mobile" type="text" placeholder="手机号码" class="user">
     <input v-model="user.code"  type="text" class="code" placeholder="短信验证码">
     <el-button id="get_code" type="primary">获取验证码</el-button>
     <button class="login_btn">登录</button>
-    <p class="go_login" >没有账号 <span>立即注册</span></p>
+    <p class="go_login" >没有账号 <router-link to="/register">立即注册</router-link></p>
   </div>
 </template>
 
@@ -30,6 +30,25 @@
 import user from "../api/user";
 import { ElMessage } from 'element-plus'
 const emit = defineEmits(["successhandle",])
+import "../utils/Tcaptcha.js"
+
+import { useStore } from "vuex";
+const store = useStore()
+
+// 显示验证码
+const show_captcha = ()=>{
+  var captcha1 = new TencentCaptcha('199215983', (res)=>{
+      // 接收验证结果的回调函数
+      /* res（验证成功） = {ret: 0, ticket: "String", randstr: "String"}
+         res（客户端出现异常错误 仍返回可用票据） = {ret: 0, ticket: "String", randstr: "String", errorCode: Number, errorMessage: "String"}
+         res（用户主动关闭验证码）= {ret: 2}
+      */
+      console.log(res);
+      // 调用登录处理
+      loginhandler(res);
+  });
+  captcha1.show(); // 显示验证码
+}
 
 // 登录处理
 const loginhandler = ()=>{
@@ -37,7 +56,7 @@ const loginhandler = ()=>{
     // 错误提示
     console.log("用户名或密码不能为空！");
     ElMessage.error('用户名或密码不能为空!');
-    return;  // 在函数/方法中，可以阻止代码继续往下执行
+    return false;  // 在函数/方法中，可以阻止代码继续往下执行
   }
 
   // 发送请求
@@ -46,18 +65,27 @@ const loginhandler = ()=>{
     password: user.password
   }).then(response=>{
     // 保存token，并根据用户的选择，是否记住密码
-    localStorage.removeItem("token");
-    sessionStorage.removeItem("token");
+    localStorage.removeItem("access");
+    localStorage.removeItem("refresh");
+    sessionStorage.removeItem("access");
+    sessionStorage.removeItem("refresh");
     console.log(response.data.access);
-    if(user.remember){ // 判断是否记住登录状态
-      // 记住登录
-      localStorage.access = response.data.access
-      localStorage.refresh = response.data.refresh
-    }else{
-      // 不记住登录，关闭浏览器以后就删除状态
-      sessionStorage.access = response.data.access;
-      sessionStorage.refresh = response.data.refresh;
-    }
+    console.log(response.data.refresh);
+    // if(user.remember){ // 判断是否记住登录状态
+    //   // 记住登录
+    //   localStorage.access = response.data.access
+    //   localStorage.refresh = response.data.refresh
+    // }else{
+    //   // 不记住登录，关闭浏览器以后就删除状态
+    //   sessionStorage.access = response.data.access;
+    //   sessionStorage.refresh = response.data.refresh;
+    // }
+    // vuex 存储用户登录信息，保存token, 并根据用户的选择，是否记住密码
+    let payload = response.data.access.split(".")[1]
+    let payload_data = JSON.parse(atob(payload))
+    console.log(payload_data)
+    store.commit("login", payload_data);
+
     // 成功提示
     ElMessage.success("登录成功！");
     console.log("登录成功！");
@@ -67,10 +95,9 @@ const loginhandler = ()=>{
     user.mobile = ""
     user.code = ""
     user.remember = false
-    emit("successhandle")
-
+    emit("successhandle", payload_data)
   }).catch(error=>{
-    console.log(error);
+    ElMessage.error("登录失败！");
   })
 }
 

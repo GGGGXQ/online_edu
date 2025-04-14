@@ -12,6 +12,6 @@ class User(AbstractUser):
     nickname = models.CharField(max_length=50, default="", null=True, verbose_name="用户昵称")
 
     class Meta:
-        db_table = 'lf_users'
+        db_table = 'ol_users'
         verbose_name = '用户信息'
         verbose_name_plural = verbose_name
