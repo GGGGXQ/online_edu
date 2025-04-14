@@ -14,7 +14,6 @@ from pathlib import Path
 import sys
 import datetime
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -188,10 +187,10 @@ LOGGING = {
             '()': 'colorlog.ColoredFormatter',
             'format': '%(log_color)s%(levelname)-8s%(reset)s %(blue)s%(message)s',
             'log_colors': {
-                'DEBUG':    'cyan',
-                'INFO':     'green',
+                'DEBUG': 'cyan',
+                'INFO': 'green',
                 'WARNING': 'yellow',
-                'ERROR':   'red',
+                'ERROR': 'red',
                 'CRITICAL': 'red,bg_white',
             },
             'style': '%'
@@ -301,3 +300,24 @@ SESSION_CACHE_ALIAS = "session"
 
 # django自定义认证
 AUTHENTICATION_BACKENDS = ['onlineapi.utils.authenticate.CustomAuthBackend', ]
+
+# 腾讯云API接口配置
+TENCENT_CLOUD = {
+    # 腾讯云访问秘钥ID
+    "SecretId": "AKID89xmZCiBWURF2f9TcbR7cw8B7tWB3tz3",
+    # 腾讯云访问秘钥key
+    "SecretKey": "HOIzTkura6PUM1ThiYEhwxkOxJWbVQBl",
+    # 验证码API配置
+    "Captcha": {
+        "endpoint": "captcha.tencentcloudapi.com",  # 验证码校验服务端域名
+        "CaptchaType": 9,  # 验证码类型，固定为9
+        "CaptchaAppId": 199215983,  # 验证码应用ID
+        "AppSecretKey": "qXQMtu6VIDj6RgRgkoA7itO3K",  # 验证码应用key
+    },
+}
+
+
+import os
+
+TENCENT_CLOUD_SECRET_ID = os.getenv('TENCENT_CLOUD_SECRET_ID')
+TENCENT_CLOUD_SECRET_KEY = os.getenv('TENCENT_CLOUD_SECRET_KEY')
