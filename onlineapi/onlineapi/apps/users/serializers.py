@@ -4,6 +4,7 @@ from rest_framework import serializers
 from rest_framework_simplejwt.settings import api_settings
 
 from .models import User
+from tencentcloudapi import TencentCloudAPI, TencentCloudSDKException
 
 
 class UserRegisterModelSerializer(serializers.ModelSerializer):
@@ -13,6 +14,8 @@ class UserRegisterModelSerializer(serializers.ModelSerializer):
     re_password = serializers.CharField(required=True, write_only=True)
     sms_code = serializers.CharField(min_length=4, max_length=6, required=True, write_only=True)
     token = serializers.CharField(read_only=True)
+    ticket = serializers.CharField(required=True, write_only=True, help_text="滑块验证码的临时凭证")
+    randstr = serializers.CharField(required=True, write_only=True, help_text="滑块验证码的随机字符串")
 
     class Meta:
         model = User
@@ -43,8 +46,17 @@ class UserRegisterModelSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(detail="手机号已注册")
         except User.DoesNotExist:
             pass
-
+        # todo 防水墙验证码
+        api = TencentCloudAPI()
+        result = api.captcha(
+            data.get("ticket"),
+            data.get("randstr"),
+            self.context['request']._requset.META.get("REMOTE_ADDR") # 客户端IP
+        )
+        if not result:
+            raise serializers.ValidationError(data="滑块验证码校验失败！")
         # todo 验证短信验证码
+
         return data
 
     def create(self, validated_data):

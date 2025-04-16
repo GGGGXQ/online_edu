@@ -38,7 +38,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return data
 
 
-def  get_user_by_account(account):
+def get_user_by_account(account):
     """"
     根据账号信息获取user模型实例对象
     :param account: 账号信息， 可以是用户名，也可以是手机号，或者其他可用于识别身份的字段信息

@@ -316,8 +316,12 @@ TENCENT_CLOUD = {
     },
 }
 
-
-import os
-
-TENCENT_CLOUD_SECRET_ID = os.getenv('TENCENT_CLOUD_SECRET_ID')
-TENCENT_CLOUD_SECRET_KEY = os.getenv('TENCENT_CLOUD_SECRET_KEY')
+# 容联云短信
+RONGLIANYUN = {
+    "accId": '2c94811c946f6bfb01959e136d003038',
+    "accToken": '5ca4d033765447799a12cb925de71891',
+    "appId": '2c94811c946f6bfb01959e136edb303f',
+    "reg_tid": 1,      # 注册短信验证码的模板ID
+    "sms_expire": 300,  # 短信有效期，单位：秒(s)
+    "sms_interval": 60,  # 短信发送的冷却时间，单位：秒(s)
+}

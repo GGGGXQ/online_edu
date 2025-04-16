@@ -15,7 +15,7 @@
             <input v-model="user.re_password" type="password" placeholder="确认密码" class="user">
             <input v-model="user.code"  type="text" class="code" placeholder="短信验证码">
             <el-button id="get_code" type="primary">获取验证码</el-button>
-            <button class="login_btn">注册</button>
+            <button class="login_btn" @click="show_captcha">注册</button>
             <p class="go_login" >已有账号 <router-link to="/login">立即登录</router-link></p>
           </div>
       </div>
@@ -24,31 +24,104 @@
 </template>
 
 <script setup>
-import {reactive, watch} from "vue"
+import {reactive, defineEmits, watch} from "vue"
 import { ElMessage } from 'element-plus'
 import {useStore} from "vuex"
+import "../utils/Tcaptcha.js"
 import user from "../api/user";
-// import "../utils/TCaptcha"
-
+import settings from "../settings";
 const store = useStore()
-
-const state = reactive({
-  password:"",    // 密码
-  re_password: "",// 确认密码
-  mobile: "",     // 手机号
-  code: "",       // 验证码
-})
 
 // 监听数据mobile是否发生变化
 watch(()=>user.mobile, (mobile, prevMobile) => {
   if(/1[3-9]\d{9}/.test(user.mobile)){
     // 发送ajax验证手机号是否已经注册
     user.check_mobile().catch(error=>{
-      ElMessage.error("该手机号已注册");
+      ElMessage.error(error.response.data.errmsg);
     })
   }
 })
 
+
+// 显示登录验证码
+const show_captcha = ()=>{
+  // 直接生成一个验证码对象
+  let  captcha1 = new TencentCaptcha(settings.captcha_app_id, (res)=>{
+    // 验证码通过验证以后的回调方法
+    if(res && res.ret === 0){
+      // 验证通过，发送登录请求
+      registerhandler(res)
+    }
+  });
+
+  // 显示验证码
+  captcha1.show();
+}
+
+
+const registerhandler = (res)=> {
+  // 注册处理
+  if (!/^1[3-9]\d{9}$/.test(user.mobile)) {
+    // 错误提示
+    ElMessage.error('错了哦，手机号格式不正确！');
+    return false // 阻止代码继续往下执行
+  }
+  if (user.password.length < 6 || user.password.length > 16) {
+    ElMessage.error('错了哦，密码必须在6~16个字符之间！');
+    return false
+  }
+
+  if (user.password !== user.re_password) {
+    ElMessage.error('错了哦，密码和确认密码不一致！');
+    return false
+  }
+
+    // 发送请求
+  user.register({
+    // 验证码通过的票据信息
+    ticket: res.ticket,
+    randstr: res.randstr,
+  }).then(response=>{
+    // 保存token，并根据用户的选择，是否记住密码
+    localStorage.removeItem("access");
+    localStorage.removeItem("refresh");
+    sessionStorage.removeItem("access");
+    sessionStorage.removeItem("refresh");
+    console.log(response.data.access);
+    console.log(response.data.refresh);
+    // if(user.remember){ // 判断是否记住登录状态
+    //   // 记住登录
+    //   localStorage.access = response.data.access
+    //   localStorage.refresh = response.data.refresh
+    // }else{
+    //   // 不记住登录，关闭浏览器以后就删除状态
+    //   sessionStorage.access = response.data.access;
+    //   sessionStorage.refresh = response.data.refresh;
+    // }
+
+    // 默认不需要记住登录
+    sessionStorage.token = response.data.access;
+
+    // vuex 存储用户登录信息，保存token, 并根据用户的选择，是否记住密码
+    let payload = response.data.access.split(".")[1]
+    let payload_data = JSON.parse(atob(payload))
+    console.log(payload_data)
+    store.commit("login", payload_data);
+    // 清空表单信息
+    user.mobile = ""
+    user.password = ""
+    user.code = ""
+    user.remember = false
+    //  成功提示
+    ElMessage.success("注册成功！");
+    // 路由跳转到首页
+    router.push("/");
+
+
+  }).catch(error=>{
+    ElMessage.error("注册失败！");
+  })
+}
 </script>
 
 <style scoped>
