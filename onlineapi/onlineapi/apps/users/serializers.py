@@ -5,6 +5,8 @@ from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 from .models import User
 from tencentcloudapi import TencentCloudAPI, TencentCloudSDKException
 
+from django_redis import get_redis_connection
+
 
 class UserRegisterModelSerializer(serializers.ModelSerializer):
     """
@@ -56,7 +58,18 @@ class UserRegisterModelSerializer(serializers.ModelSerializer):
         if not result:
             raise serializers.ValidationError(detail="滑块验证码校验失败！")
         # todo 验证短信验证码
-
+        # 从redis中提取短信
+        redis = get_redis_connection("sms_code")
+        code = redis.get(f"sms_{mobile}")
+        if code is None:
+            """获取不到验证码，则表示验证码已经过期了"""
+            raise serializers.ValidationError(detail="短信验证码已过期", code="sms_code")
+        # 从redis提取的数据，字符串都是bytes类型，所以decode
+        if code.decode() != data.get("sms_code"):
+            raise serializers.ValidationError(detail="短信验证码错误", code="sms_code")
+        print(f"code={code.decode()}, sms_code={data.get('sms_code')}")
+        # 删除掉redis中的短信，后续不管用户是否注册成功，至少当前这条短信验证码已经没有用处了
+        redis.delete(f"sms_{mobile}")
         return data
 
     def create(self, validated_data):
@@ -73,14 +86,13 @@ class UserRegisterModelSerializer(serializers.ModelSerializer):
             avatar=constants.DEFAULT_USER_AVATAR,
         )
 
-        refresh = RefreshToken.for_user(user)
-        access = refresh.access_token
-
         return user
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        refresh = RefreshToken.for_user(instance)
-        data['access_token'] = str(refresh.access_token)
-        data['refresh_token'] = str(refresh)
+        # 新增JWT令牌生成逻辑
+        from authenticate import CustomTokenObtainPairSerializer
+        custom_token = CustomTokenObtainPairSerializer()
+        token_data = custom_token.generate_jwt_tokens(instance)
+        data.update(token_data)
         return data

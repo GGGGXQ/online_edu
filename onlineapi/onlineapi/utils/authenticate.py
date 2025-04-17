@@ -19,6 +19,17 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             token['credit'] = user.credit
         return token
 
+    def generate_jwt_tokens(self, user):
+        """
+        生成JWT令牌
+        """
+        refresh = self.get_token(user)
+        data = {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token)
+        }
+        return data
+
     def validate(self, attrs):
         username = attrs.get('username')
         password = attrs.get('password')
@@ -30,11 +41,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             )
 
         self.user = user
-        refresh = self.get_token(self.user)
-        data = {
-            'refresh': str(refresh),
-            'access': str(refresh.access_token)
-        }
+        data = self.generate_jwt_tokens(self.user)
         return data
 
 

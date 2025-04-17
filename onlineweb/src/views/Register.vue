@@ -89,8 +89,9 @@ const registerhandler = (res)=> {
     localStorage.removeItem("refresh");
     sessionStorage.removeItem("access");
     sessionStorage.removeItem("refresh");
-    console.log(response.data.access_token);
-    console.log(response.data.refresh_token);
+    console.log(response.data);
+    console.log(response.data.access);
+    console.log(response.data.refresh);
     // if(user.remember){ // 判断是否记住登录状态
     //   // 记住登录
     //   localStorage.access = response.data.access
@@ -102,11 +103,11 @@ const registerhandler = (res)=> {
     // }
 
     // 默认不需要记住登录
-    sessionStorage.token = response.data.access_token;
+    sessionStorage.token = response.data.access;
 
     // vuex 存储用户登录信息，保存token, 并根据用户的选择，是否记住密码
     console.log(response.data)
-    let payload = response.data.access_token.split(".")[1]
+    let payload = response.data.access.split(".")[1]
     let payload_data = JSON.parse(atob(payload))
     console.log(payload_data)
     store.commit("login", payload_data);
