@@ -35,7 +35,7 @@ class UserRegisterModelSerializer(serializers.ModelSerializer):
         """验证客户端数据"""
         # 手机号格式验证
         mobile = data.get("mobile", None)
-        if not re.match("^1[3-9]\d{9}$", mobile):
+        if not re.match("^1[3-9]\\d{9}$", mobile):
             raise serializers.ValidationError(detail="手机号格式不正确", code="mobile")
         # 密码和确认密码
         password = data.get("password")

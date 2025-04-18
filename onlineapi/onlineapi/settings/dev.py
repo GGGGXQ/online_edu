@@ -46,6 +46,7 @@ INSTALLED_APPS = [
 
     "home",
     "users",
+    "courses",
 ]
 
 MIDDLEWARE = [
@@ -248,9 +249,9 @@ REST_FRAMEWORK = {
 
 # jwt认证相关配置
 SIMPLE_JWT = {
-    # Access Token 有效期（通常较短）
+    # Access Token 有效期
     'ACCESS_TOKEN_LIFETIME': datetime.timedelta(weeks=1),  # 一周有效
-    # Refresh Token 有效期（通常较长）
+    # Refresh Token 有效期
     'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=30),  # 一个月有效
     'ROTATE_REFRESH_TOKENS': False,  # 是否在刷新时旋转 Refresh Token
     'BLACKLIST_AFTER_ROTATION': False,  # 旋转后是否将旧 Token 列入黑名单

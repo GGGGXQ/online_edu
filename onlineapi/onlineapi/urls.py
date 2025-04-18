@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.conf import settings
-from django.views.static import serve
+from django.views.static import serve  # 静态文件代理访问模块
 from django.urls import path, include, re_path
 
 urlpatterns = [
@@ -23,4 +23,5 @@ urlpatterns = [
     re_path(r'uploads/(?P<path>.*)', serve, {"document_root": settings.MEDIA_ROOT}),
     path('home/', include("home.urls")),
     path('users/', include("users.urls")),
+    path('courses', include("courses.urls")),
 ]
