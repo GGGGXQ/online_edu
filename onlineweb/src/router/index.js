@@ -1,11 +1,11 @@
-import {createRouter, createWebHistory} from 'vue-router'
+import {createRouter, createWebHistory, createWebHashHistory} from 'vue-router'
 import store from '../store';
 
 // 路由列表
 const routes = [
   {
     meta:{
-        title: "在线教育-首页",
+        title: "在线教育-站点首页",
         keepAlive: true
     },
     path: '/',         // uri访问地址
@@ -17,7 +17,7 @@ const routes = [
         title: "在线教育-用户登录",
         keepAlive: true
     },
-    path:'/login',      // uri访问地址
+    path:'/login',
     name: "Login",
     component: ()=> import("../views/Login.vue")
   },
@@ -39,6 +39,15 @@ const routes = [
     path: '/user',
     name: "User",
     component: ()=> import("../views/User.vue"),
+  },
+  {
+    meta:{
+        title: "在线教育-课程列表",
+        keepAlive: true,
+    },
+    path: '/project',
+    name: "Course",
+    component: ()=> import("../views/Course.vue"),
   },
 ]
 

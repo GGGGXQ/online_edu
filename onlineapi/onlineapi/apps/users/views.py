@@ -9,12 +9,13 @@ from tencentcloudapi import TencentCloudAPI
 
 from .models import User
 from .serializers import UserRegisterModelSerializer
+from .tasks import send_sms
 
 # 短信模块
 import random
 from django_redis import get_redis_connection
 from django.conf import settings
-from ronglianyunapi import send_sms
+# from ronglianyunapi import send_sms
 
 
 # Create your views here.
@@ -87,7 +88,9 @@ class SMSAPIView(APIView):
         # 短信发送间隔时间
         sms_interval = settings.RONGLIANYUN["sms_interval"]
         # 调用第三方sdk发送短信
-        send_sms(settings.RONGLIANYUN.get("reg_tid"), mobile, datas=(code, time // 60))
+        # send_sms(settings.RONGLIANYUN.get("reg_tid"), mobile, datas=(code, time // 60))
+        # 异步发送短信
+        send_sms.delay(settings.RONGLIANYUN.get("reg_tid"), mobile, datas=(code, time // 60))
 
         # 记录code到redis中，并以time作为有效期
         # 使用redis提供的管道对象pipeline来优化redis的写入操作[添加/修改/删除]
