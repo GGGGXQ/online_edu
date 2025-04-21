@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'corsheaders',  # 跨域请求
     'ckeditor',  # 富文本编辑器
     'ckeditor_uploader',  # 富文本编辑器上传文件子应用
+    'stdimage',
 
     "home",
     "users",
@@ -383,3 +384,23 @@ CKEDITOR_CONFIGS = {
         'height': 120,
     },
 }
+
+# admin站点公共配置
+from django.contrib import admin
+admin.AdminSite.site_header = '在线教育'
+admin.AdminSite.site_title = '在线教育站点管理'
+
+# 登录界面logo
+SIMPLEUI_LOGO = '/uploads/logo.svg'
+# 快速操作
+SIMPLEUI_HOME_QUICK = True
+# 服务器信息
+SIMPLEUI_HOME_INFO = True
+
+# 关闭simpleui内置的使用分析
+SIMPLEUI_ANALYSIS = False
+# 离线模式
+SIMPLEUI_STATIC_OFFLINE = True
+# 首页图标地址
+SIMPLEUI_INDEX = "http://www.onlineedu.cn:5173/"
+
