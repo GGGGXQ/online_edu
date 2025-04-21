@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
-import sys
+import sys, os
 import datetime
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -309,23 +309,34 @@ AUTHENTICATION_BACKENDS = ['onlineapi.utils.authenticate.CustomAuthBackend', ]
 # 腾讯云API接口配置
 TENCENT_CLOUD = {
     # 腾讯云访问秘钥ID
-    "SecretId": "AKID89xmZCiBWURF2f9TcbR7cw8B7tWB3tz3",
+    "SecretId": os.getenv("TENCENT_SECRET_ID"),
     # 腾讯云访问秘钥key
-    "SecretKey": "HOIzTkura6PUM1ThiYEhwxkOxJWbVQBl",
+    "SecretKey": os.getenv("TENCENT_SECRET_KEY"),
     # 验证码API配置
     "Captcha": {
         "endpoint": "captcha.tencentcloudapi.com",  # 验证码校验服务端域名
         "CaptchaType": 9,  # 验证码类型，固定为9
         "CaptchaAppId": 199215983,  # 验证码应用ID
-        "AppSecretKey": "qXQMtu6VIDj6RgRgkoA7itO3K",  # 验证码应用key
+        "AppSecretKey": os.getenv("TENCENT_CAPTCHA_SECRET_KEY"),  # 验证码应用key
     },
 }
 
+# 阿里云OSS云存储
+
+OSS_ACCESS_KEY_ID = os.getenv("OSS_ACCESS_KEY_ID")
+OSS_ACCESS_KEY_SECRET = os.getenv("OSS_ACCESS_KEY_SECRET")
+OSS_ENDPOINT = os.getenv("OSS_ENDPOINT")
+OSS_BUCKET_NAME = os.getenv("OSS_BUCKET_NAME")
+
+# 添加配置后django-admin后台上传的ImageField, FileField等字段都会默认自动上传道oss的服务器中，访问路径也会自动替换
+# 注释后则访问路径为本地
+DEFAULT_FILE_STORAGE = 'django_oss_storage.backends.OssMediaStorage'
+
 # 容联云短信
 RONGLIANYUN = {
-    "accId": '2c94811c946f6bfb01959e136d003038',
-    "accToken": '5ca4d033765447799a12cb925de71891',
-    "appId": '2c94811c946f6bfb01959e136edb303f',
+    "accId": os.getenv("RONGLIANYUN_ACCID"),
+    "accToken": os.getenv("RONGLIANYUN_ACCTOKEN"),
+    "appId": os.getenv("RONGLIANYUN_APPID"),
     "reg_tid": 1,  # 注册短信验证码的模板ID
     "sms_expire": 300,  # 短信有效期，单位：秒(s)
     "sms_interval": 60,  # 短信发送的冷却时间，单位：秒(s)
@@ -355,6 +366,7 @@ CELERY_DISABLE_RATE_LIMITS = True
 # celery的任务结果内容格式
 CELERY_ACCEPT_CONTENT = ['json', 'pickle']
 # 设置定时任务（定时多次调用）的调用列表，需要单独运行SCHEDULE命令才能让celery执行定时任务：celery -A mycelery.main beat，当然worker还是要启动的
+
 from celery.schedules import crontab
 
 CELERY_BEAT_SCHEDULE = {
@@ -404,3 +416,5 @@ SIMPLEUI_STATIC_OFFLINE = True
 # 首页图标地址
 SIMPLEUI_INDEX = "http://www.onlineedu.cn:5173/"
 
+# 忽略CKEditor警告
+SILENCED_SYSTEM_CHECKS = ['ckeditor.W001']

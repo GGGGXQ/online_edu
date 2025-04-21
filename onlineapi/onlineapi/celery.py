@@ -1,7 +1,8 @@
 import os
 from celery import Celery
+from dotenv import load_dotenv
 
-
+load_dotenv()
 # 必须在实例化celery应用之前执行
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'onlineapi.settings.dev')
 
