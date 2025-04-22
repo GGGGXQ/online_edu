@@ -14,6 +14,12 @@ class CourseDirectionListAPIView(ListAPIView):
 
 class CourseCategoryListAPIView(ListAPIView):
     """学习分类"""
-    queryset = CourseCategory.objects.filter(is_show=True, is_deleted=False).order_by("orders", "-id")
     serializer_class = CourseCategoryModelSerializer
     pagination_class = None
+
+    def get_queryset(self):
+        queryset = CourseCategory.objects.filter(is_show=True, is_deleted=False)
+        direction = int(self.kwargs.get("direction"), 0)
+        if direction > 0:
+            queryset = queryset.filter(direction=direction)
+        return queryset.order_by("orders", "-id").all()
