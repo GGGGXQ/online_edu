@@ -161,7 +161,7 @@ STATICFILES_DIRS = [
 ]
 
 MEDIA_ROOT = BASE_DIR / "uploads"
-MEDIA_URL = "/uploads/"
+# MEDIA_URL = "/uploads/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -328,9 +328,18 @@ OSS_ACCESS_KEY_SECRET = os.getenv("OSS_ACCESS_KEY_SECRET")
 OSS_ENDPOINT = os.getenv("OSS_ENDPOINT")
 OSS_BUCKET_NAME = os.getenv("OSS_BUCKET_NAME")
 
+OSS = {
+    "ACCESS_KEY_ID": OSS_ACCESS_KEY_ID,
+    "ACCESS_KEY_SECRET": OSS_ACCESS_KEY_SECRET,
+    "ENDPOINT": OSS_ENDPOINT,
+    "BUCKET_NAME": OSS_BUCKET_NAME,
+    "SSL": False,
+}
+
 # 添加配置后django-admin后台上传的ImageField, FileField等字段都会默认自动上传道oss的服务器中，访问路径也会自动替换
 # 注释后则访问路径为本地
 DEFAULT_FILE_STORAGE = 'django_oss_storage.backends.OssMediaStorage'
+MEDIA_URL = f"https://{OSS_BUCKET_NAME}.{OSS_ENDPOINT}/uploads/"
 
 # 容联云短信
 RONGLIANYUN = {
