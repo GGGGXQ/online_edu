@@ -1,4 +1,4 @@
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.filters import OrderingFilter
@@ -9,7 +9,7 @@ from drf_haystack.filters import HaystackFilter
 
 from .models import CourseDirection, CourseCategory, Course
 from .serializers import CourseDirectionModelSerializer, CourseCategoryModelSerializer, CourseInfoModelSerializer
-from .serializers import CourseIndexHaystackSerializer
+from .serializers import CourseIndexHaystackSerializer, CourseRetrieveModelSerializer
 from .paginations import CourseListPageNumberPagination
 import constants
 from datetime import datetime, timedelta
@@ -103,3 +103,8 @@ class HotWordAPIView(APIView):
             word_list = redis.zrevrange(constants.DEFAULT_HOT_WORD, 0, constants.HOT_WORD_LENGTH - 1)
             return Response(word_list)
 
+
+class CourseRetrieveAPIView(RetrieveAPIView):
+    """课程详情信息"""
+    queryset = Course.objects.filter(is_show=True, is_deleted=False).all()
+    serializer_class = CourseRetrieveModelSerializer
