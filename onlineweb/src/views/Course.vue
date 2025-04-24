@@ -53,7 +53,7 @@
             </div>
             <ul class="course-list clearfix">
               <li class="course-card" v-for="course_info in course.course_list">
-                <a target="_blank" href="">
+                <router-link :to="`/project/${course_info.id}`">
                     <div class="img"><img :src="course_info.course_cover" alt=""></div>
                     <p class="title ellipsis2">{{course_info.name}}</p>
                     <p class="one">
@@ -69,60 +69,8 @@
                         <span class="origin-price l delete-line" v-if="course_info.discount.price">￥{{parseFloat(course_info.price).toFixed(2)}}</span>
                         <span class="add-shop-cart r"><img class="icon imv2-shopping-cart" src="../assets/cart2.svg">加购物车</span>
                     </p>
-                </a>
+                </router-link>
               </li>
-<!--              <li class="course-card">-->
-<!--                <a target="_blank" href="">-->
-<!--                    <div class="img"><img src="../assets/course-2.png" alt=""></div>-->
-<!--                    <p class="title ellipsis2">Flink+ClickHouse 玩转企业级实时大数据开发，助你实现弯道超车</p>-->
-<!--                    <p class="one">-->
-<!--                        <span>进阶 · 246人报名</span>-->
-<!--                        <span class="discount r"><i class="name">限时优惠</i><i class="countdown">6<span class="day">天</span>01:39:21</i></span>-->
-<!--                    </p>-->
-<!--                    <p class="two clearfix">-->
-<!--                        <span class="price l red bold">￥328.00</span>-->
-<!--                        <span class="origin-price l delete-line">￥368.00</span>-->
-<!--                        <span class="add-shop-cart r"><img class="icon imv2-shopping-cart" src="../assets/cart2.svg">加购物车</span>-->
-<!--                    </p>-->
-<!--                </a>-->
-<!--              </li>-->
-<!--              <li class="course-card">-->
-<!--                <a target="_blank" href="">-->
-<!--                    <div class="img"><img src="../assets/course-3.png" alt=""></div>-->
-<!--                    <p class="title ellipsis2">Flink+ClickHouse 玩转企业级实时大数据开发，助你实现弯道超车</p>-->
-<!--                    <p class="one">-->
-<!--                        <span>进阶 · 246人报名</span>-->
-<!--                        <span class="discount r"><i class="name">限时优惠</i><i class="countdown">16<span class="day">天</span>01:39:21</i></span>-->
-<!--                    </p>-->
-<!--                    <p class="two clearfix">-->
-<!--                        <span class="price l red bold">￥328.00</span>-->
-<!--                        <span class="origin-price l delete-line">￥368.00</span>-->
-<!--                        <span class="add-shop-cart r"><img class="icon imv2-shopping-cart" src="../assets/cart2.svg">加购物车</span>-->
-<!--                    </p>-->
-<!--                </a>-->
-<!--              </li>-->
-<!--              <li class="course-card">-->
-<!--                <a target="_blank" href="">-->
-<!--                    <div class="img"><img src="../assets/course-4.png" alt=""></div>-->
-<!--                    <p class="title ellipsis2">Flink+ClickHouse 玩转企业级实时大数据开发，助你实现弯道超车</p>-->
-<!--                    <p class="one"><span>进阶 · 246人报名</span></p>-->
-<!--                    <p class="two clearfix">-->
-<!--                        <span class="price l red bold">￥399.00</span>-->
-<!--                        <span class="add-shop-cart r"><img class="icon imv2-shopping-cart" src="../assets/cart2.svg">加购物车</span>-->
-<!--                    </p>-->
-<!--                </a>-->
-<!--              </li>-->
-<!--              <li class="course-card">-->
-<!--                <a target="_blank" href="">-->
-<!--                    <div class="img"><img src="../assets/course-5.png" alt=""></div>-->
-<!--                    <p class="title ellipsis2">Flink+ClickHouse 玩转企业级实时大数据开发，助你实现弯道超车</p>-->
-<!--                    <p class="one"><span>进阶 · 246人报名</span></p>-->
-<!--                    <p class="two clearfix">-->
-<!--                        <span class="price l red bold">￥399.00</span>-->
-<!--                        <span class="add-shop-cart r"><img class="icon imv2-shopping-cart" src="../assets/cart2.svg">加购物车</span>-->
-<!--                    </p>-->
-<!--                </a>-->
-<!--              </li>-->
             </ul>
             <div class="page" v-if="course.count > course.size">
                 <a href="" v-if="course.has_perv" @click.prevent.stop="course.page=1">首页</a>
