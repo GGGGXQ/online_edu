@@ -131,6 +131,12 @@ class Course(BaseModel):
     def discount_json(self):
         return json.dumps(self.discount)
 
+    @property
+    def can_free_study(self):
+        """是否允许试学"""
+        lesson_list = self.lesson_list.filter(is_deleted=False, is_show=True).order_by("orders").all()
+        return len(lesson_list) > 0
+
 
 class Teacher(BaseModel):
     role_choice = (
@@ -211,6 +217,19 @@ class CourseChapter(BaseModel):
     text.short_description = "章节名称"
     text.allow_tags = True
     text.admin_order_field = "orders"
+
+    def get_lesson_list(self):
+        """返回当前章节的课时列表"""
+        lesson_list = self.lesson_list.filter(is_deleted=False, is_show=True).order_by("orders").all()
+        return [{
+            "id": lesson.id,
+            "name": lesson.name,
+            "orders": lesson.orders,
+            "duration": lesson.duration,
+            "lesson_type": lesson.lesson_type,
+            "lesson_link": lesson.lesson_link,
+            "free_trail": lesson.free_trail
+        } for lesson in lesson_list]
 
 
 class CourseLesson(BaseModel):

@@ -7,9 +7,9 @@ from django_redis import get_redis_connection
 from drf_haystack.viewsets import HaystackViewSet
 from drf_haystack.filters import HaystackFilter
 
-from .models import CourseDirection, CourseCategory, Course
+from .models import CourseDirection, CourseCategory, Course, CourseChapter
 from .serializers import CourseDirectionModelSerializer, CourseCategoryModelSerializer, CourseInfoModelSerializer
-from .serializers import CourseIndexHaystackSerializer, CourseRetrieveModelSerializer
+from .serializers import CourseIndexHaystackSerializer, CourseRetrieveModelSerializer, CourseChapterModelSerializer
 from .paginations import CourseListPageNumberPagination
 import constants
 from datetime import datetime, timedelta
@@ -108,3 +108,18 @@ class CourseRetrieveAPIView(RetrieveAPIView):
     """课程详情信息"""
     queryset = Course.objects.filter(is_show=True, is_deleted=False).all()
     serializer_class = CourseRetrieveModelSerializer
+
+
+class CourseChapterListAPIView(ListAPIView):
+    """课程章节列表"""
+    serializer_class = CourseChapterModelSerializer
+
+    def get_queryset(self):
+        """列表数据"""
+        course = int(self.kwargs.get("course", 0))
+        try:
+            ret = Course.objects.filter(pk=course).all()
+        except:
+            return []
+        queryset = CourseChapter.objects.filter(course=course, is_show=True, is_deleted=False).order_by("orders", "id")
+        return queryset.all()

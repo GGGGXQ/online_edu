@@ -13,4 +13,5 @@ urlpatterns = [
     re_path(r"^(?P<direction>\d+)/(?P<category>\d+)/$", views.CourseListAPIView.as_view()),
     path("hot_word/", views.HotWordAPIView.as_view()),
     re_path(r"^(?P<pk>\d+)/$", views.CourseRetrieveAPIView.as_view()),
+    re_path(r"^(?P<course>\d+)/chapters/$", views.CourseChapterListAPIView.as_view()),
 ] + router.urls
