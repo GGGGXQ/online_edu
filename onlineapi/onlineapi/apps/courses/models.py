@@ -3,6 +3,7 @@ from ckeditor.fields import RichTextField  # 不支持上传文件
 from ckeditor_uploader.fields import RichTextUploadingField  # 支持上传文件
 from stdimage import StdImageField
 from django.utils.html import format_html
+import json
 
 
 # Create your models here.
@@ -124,8 +125,11 @@ class Course(BaseModel):
         return {
             "type": ["限时优惠", "限时减免"].pop(random.randint(0, 1)),  # 优惠类型
             "expire": random.randint(100000, 1200000),  # 倒计时
-            "price": self.price - random.randint(1, 10) * 10,  # 优惠价格
+            "price": float(self.price - random.randint(1, 10) * 10),  # 优惠价格
         }
+
+    def discount_json(self):
+        return json.dumps(self.discount)
 
 
 class Teacher(BaseModel):

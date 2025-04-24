@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'ckeditor',  # 富文本编辑器
     'ckeditor_uploader',  # 富文本编辑器上传文件子应用
     'stdimage',
+    'haystack',
 
     "home",
     "users",
@@ -76,7 +77,9 @@ ROOT_URLCONF = 'onlineapi.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            BASE_DIR / "templates",  # 模板路径
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -427,3 +430,18 @@ SIMPLEUI_INDEX = "http://www.onlineedu.cn:5173/"
 
 # 忽略CKEditor警告
 SILENCED_SYSTEM_CHECKS = ['ckeditor.W001']
+
+# haystack连接elasticsearch的配置信息
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        # haystack操作es的核心模块
+        'ENGINE': 'haystack.backends.elasticsearch7_backend.Elasticsearch7SearchEngine',
+        # es服务器地址
+        'URL': 'http://192.168.171.128:9200/',
+        # es索引仓库
+        'INDEX_NAME': 'haystack',
+    },
+}
+
+# 当mysqlORM操作数据库改变时，自动更新es的索引，否则es的索引会找不到新增的数据
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'

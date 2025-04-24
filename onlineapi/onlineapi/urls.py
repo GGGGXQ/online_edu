@@ -23,6 +23,6 @@ urlpatterns = [
     re_path(r'uploads/(?P<path>.*)', serve, {"document_root": settings.MEDIA_ROOT}),
     path('home/', include("home.urls")),
     path('users/', include("users.urls")),
-    path('courses', include("courses.urls")),
+    path('courses/', include("courses.urls")),
     path('ckeditor/', include('ckeditor_uploader.urls')),
 ]

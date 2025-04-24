@@ -1,8 +1,12 @@
 from rest_framework.generics import ListAPIView
 from rest_framework.filters import OrderingFilter
 
+from drf_haystack.viewsets import HaystackViewSet
+from drf_haystack.filters import HaystackFilter
+
 from .models import CourseDirection, CourseCategory, Course
 from .serializers import CourseDirectionModelSerializer, CourseCategoryModelSerializer, CourseInfoModelSerializer
+from .serializers import CourseIndexHaystackSerializer
 from .paginations import CourseListPageNumberPagination
 
 
@@ -35,13 +39,14 @@ class CourseCategoryListAPIView(ListAPIView):
 class CourseListAPIView(ListAPIView):
     """课程列表接口"""
     serializer_class = CourseInfoModelSerializer
-    filter_backends = ['id', 'students', 'orders']
+    filter_backends = [OrderingFilter]
+    ordering_fields = ['id', 'students', 'orders']
     pagination_class = CourseListPageNumberPagination
 
     def get_queryset(self):
         queryset = Course.objects.filter(is_deleted=False, is_show=True).order_by("-orders", "-id")
-        direction = int(self.kwargs.get("direction"), 0)
-        category = int(self.kwargs.get("category"), 0)
+        direction = int(self.kwargs.get("direction", 0))
+        category = int(self.kwargs.get("category", 0))
         # 只有在学习方向大于0的情况下才进行学习方向的过滤
         if direction > 0:
             queryset = queryset.filter(direction=direction)
@@ -49,3 +54,13 @@ class CourseListAPIView(ListAPIView):
         if category > 0:
             queryset = queryset.filter(category=category)
         return queryset.all()
+
+
+class CourseSearchViewSet(HaystackViewSet):
+    """课程信息全文搜索视图类"""
+    # 指定本次搜索的最终真实数据的保存模型
+    index_models = [Course]
+    serializer_class = CourseIndexHaystackSerializer
+    filter_backends = [OrderingFilter, HaystackFilter]
+    ordering_fields = ('id', 'students', 'orders')
+    pagination_class = CourseListPageNumberPagination
