@@ -8,10 +8,10 @@
                     <router-link class="title" to="/course"><img class="h100" src="../assets/coding-title.png" alt=""></router-link>
                     <div>真实项目实战演练</div>
                 </div>
-                <div class="actual-header-search">
+                 <div class="actual-header-search">
                     <div class="search-inner">
-                        <input class="actual-search-input" placeholder="搜索感兴趣的实战课程内容" type="text" autocomplete="off">
-                        <img class="actual-search-button" src="../assets/search.svg" />
+                        <input class="actual-search-input" v-model="course.text" placeholder="搜索感兴趣的实战课程内容" type="text" autocomplete="off">
+                        <img class="actual-search-button" src="../assets/search.svg" @click.prevent.stop="get_course_list" />
                     </div>
                     <div class="actual-searchtags">
                     </div>
@@ -160,6 +160,8 @@ course.get_course_direction().then(response=>{
 
 // 获取课程分类的列表数据
 const get_category = ()=>{
+  // 重置当前选中的课程分类
+  course.current_category=0;
   // 获取课程分类
   course.get_course_category().then(response=>{
     course.category_list = response.data;
@@ -169,15 +171,21 @@ const get_category = ()=>{
 get_category();
 
 
-
 const get_course_list = ()=>{
   // 获取课程列表
-  course.get_course_list().then(response=>{
+  let ret  = null // 预设一个用于保存服务端返回的数据
+  if(course.text) {
+    ret = course.search_course()
+  }else{
+    ret = course.get_course_list()
+  }
+  ret.then(response=>{
     course.course_list = response.data.results;
     // 总数据量
     course.count = response.data.count;
     course.has_perv = !!response.data.previous; // !!2个非表示把数据转换成布尔值
     course.has_next = !!response.data.next;
+
     // 优惠活动的倒计时
     course.start_timer();
   })
@@ -190,19 +198,26 @@ watch(
     // 监听当前学习方向，在改变时，更新对应方向下的课程分类与课程信息
     ()=> course.current_direction,
     ()=>{
+        // 重置搜索文本框
+        course.text = "";
+        // 重置页码
+        course.page = 1;
         // 重置排序条件
         course.ordering = "-id";
-        // 重置当前选中的课程分类
-        course.current_category=0;
+
         get_category();
         get_course_list();
     }
 )
 
 watch(
-    // 监听切换不同的课程分类，在改变时，更新对应分类下的课程信息
+    // 监听切换不同的课程分类
     ()=> course.current_category,
     ()=>{
+        // 重置搜索文本框
+        course.text = "";
+        // 重置页码
+        course.page = 1;
         // 重置排序条件
         course.ordering = "-id";
         get_course_list();
@@ -213,6 +228,8 @@ watch(
     // 监听课程切换不同的排序条件
     ()=>course.ordering,
     ()=>{
+        // 重置页码
+        course.page = 1;
         get_course_list();
     }
 )
