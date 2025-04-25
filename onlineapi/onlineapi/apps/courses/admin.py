@@ -124,7 +124,7 @@ class ActivityModelAdmin(admin.ModelAdmin):
     list_display = ["id", "name", "start_time", "end_time", "remark"]
 
 
-admin.register(Activity, ActivityModelAdmin)
+admin.site.register(Activity, ActivityModelAdmin)
 
 
 class DiscountTypeModelAdmin(admin.ModelAdmin):
@@ -132,7 +132,7 @@ class DiscountTypeModelAdmin(admin.ModelAdmin):
     list_display = ["id", "name", "remark"]
 
 
-admin.register(DiscountType, DiscountTypeModelAdmin)
+admin.site.register(DiscountType, DiscountTypeModelAdmin)
 
 
 class DiscountModelAdmin(admin.ModelAdmin):
@@ -140,7 +140,7 @@ class DiscountModelAdmin(admin.ModelAdmin):
     list_display = ["id", "name", "discount_type", "condition", "sale"]
 
 
-admin.register(Discount, DiscountModelAdmin)
+admin.site.register(Discount, DiscountModelAdmin)
 
 
 class CourseActivityPriceModelAdmin(admin.ModelAdmin):
@@ -148,4 +148,4 @@ class CourseActivityPriceModelAdmin(admin.ModelAdmin):
     list_display = ["id", "course", "activity", "discount"]
 
 
-admin.register(CourseActivityPrice, CourseActivityPriceModelAdmin)
+admin.site.register(CourseActivityPrice, CourseActivityPriceModelAdmin)

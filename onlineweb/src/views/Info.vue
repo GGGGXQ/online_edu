@@ -36,8 +36,8 @@
             </div>
             <p class="course-price" v-if="course.info.discount.price >= 0">
               <span>活动价</span>
-              <span class="discount">¥{{ parseFloat(course.info.discount.price).toFixed(2) }}</span>
-              <span class="original">¥{{ parseFloat(course.info.price).toFixed(2) }}</span>
+              <span class="discount">¥{{parseFloat(course.info.discount.price).toFixed(2)}}</span>
+              <span class="original">¥{{parseFloat(course.info.price).toFixed(2)}}</span>
             </p>
             <div class="buy">
               <div class="buy-btn">
