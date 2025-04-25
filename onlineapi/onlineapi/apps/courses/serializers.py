@@ -4,6 +4,7 @@ from drf_haystack.serializers import HaystackSerializer
 from .search_indexes import CourseIndex
 from django.conf import settings
 
+
 class CourseDirectionModelSerializer(serializers.ModelSerializer):
     """学习方向的序列化器"""
 
@@ -45,7 +46,7 @@ class CourseIndexHaystackSerializer(HaystackSerializer):
         return super().to_representation(instance)
 
 
-class CourseTeacherModelSerializer(serializers.ModelSerializer):
+class CourseTeachModelSerializer(serializers.ModelSerializer):
     """课程老师信息"""
 
     class Meta:
@@ -59,7 +60,7 @@ class CourseRetrieveModelSerializer(serializers.ModelSerializer):
     # direction = serializers.SlugRelatedField(read_only=True, slug_field='name')
     category_name = serializers.CharField(source="category.name")
     # 序列化器嵌套
-    teacher = CourseTeacherModelSerializer
+    teacher = CourseTeachModelSerializer()
 
     class Meta:
         model = Course
@@ -76,4 +77,3 @@ class CourseChapterModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = CourseChapter
         fields = ["id", "orders", "name", "summary", "get_lesson_list"]
-

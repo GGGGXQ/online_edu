@@ -126,6 +126,9 @@ const get_hot_word = ()=>{
 }
 
 
+get_hot_word();
+
+
 const get_course_list = ()=>{
   // 获取课程列表
   let ret  = null // 预设一个用于保存服务端返回的数据

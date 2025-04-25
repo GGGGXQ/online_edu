@@ -25,12 +25,15 @@ class CourseDirectionListAPIView(ListAPIView):
 
 class CourseCategoryListAPIView(ListAPIView):
     """学习分类"""
+    # queryset = CourseCategory.objects.filter(is_show=True, is_deleted=False).order_by("orders","-id")
     serializer_class = CourseCategoryModelSerializer
     pagination_class = None
 
     def get_queryset(self):
+        # 类视图中，获取路由参数
         queryset = CourseCategory.objects.filter(is_show=True, is_deleted=False)
-        direction = int(self.kwargs.get("direction"), 0)
+        # 如果direction为0，则表示查询所有的课程分类，如果大于0，则表示按学习方向来查找课程分类
+        direction = int(self.kwargs.get("direction", 0))
         if direction > 0:
             queryset = queryset.filter(direction=direction)
         return queryset.order_by("orders", "-id").all()
@@ -44,7 +47,7 @@ class CourseCategoryListAPIView(ListAPIView):
 class CourseListAPIView(ListAPIView):
     """课程列表接口"""
     serializer_class = CourseInfoModelSerializer
-    filter_backends = [OrderingFilter]
+    filter_backends = [OrderingFilter, ]
     ordering_fields = ['id', 'students', 'orders']
     pagination_class = CourseListPageNumberPagination
 
@@ -55,9 +58,11 @@ class CourseListAPIView(ListAPIView):
         # 只有在学习方向大于0的情况下才进行学习方向的过滤
         if direction > 0:
             queryset = queryset.filter(direction=direction)
+
         # 只有在课程分类大于0的情况下才进行课程分类的过滤
         if category > 0:
             queryset = queryset.filter(category=category)
+
         return queryset.all()
 
 
@@ -80,6 +85,7 @@ class CourseSearchViewSet(HaystackViewSet):
             redis.zincrby(key, 1, text)  # 让有序集合中的text搜索关键字次数+1，如果该关键字第一次出现，则为1
             if not is_exists:
                 redis.expire(key, constants.HOT_WORD_EXPIRE * 24 * 3600)
+
         return super().list(request, *args, **kwargs)
 
 
@@ -115,7 +121,7 @@ class CourseChapterListAPIView(ListAPIView):
     serializer_class = CourseChapterModelSerializer
 
     def get_queryset(self):
-        """列表数据"""
+        """列表页数据"""
         course = int(self.kwargs.get("course", 0))
         try:
             ret = Course.objects.filter(pk=course).all()

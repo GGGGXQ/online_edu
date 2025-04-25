@@ -3,6 +3,7 @@ from ckeditor.fields import RichTextField  # 不支持上传文件
 from ckeditor_uploader.fields import RichTextUploadingField  # 支持上传文件
 from stdimage import StdImageField
 from django.utils.html import format_html
+from django.utils import timezone as datetime
 import json
 
 
@@ -268,3 +269,65 @@ class CourseLesson(BaseModel):
     text2.short_description = "课时名称"
     text2.allow_tags = True
     text2.admin_order_field = "orders"
+
+
+class Activity(BaseModel):
+    start_time = models.DateTimeField(default=datetime.now(), verbose_name="开始时间")
+    end_time = models.DateTimeField(default=datetime.now(), verbose_name="结束时间")
+    description = RichTextUploadingField(blank=True, null=True, verbose_name="活动介绍")
+    remark = models.TextField(blank=True, null=True, verbose_name="备注信息")
+
+    class Meta:
+        db_table = "ol_activity"
+        verbose_name = "优惠活动"
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.name
+
+
+class DiscountType(BaseModel):
+    remark = models.CharField(max_length=250, blank=True, null=True, verbose_name="备注信息")
+
+    class Meta:
+        db_table = "ol_discount_type"
+        verbose_name = "优惠类型"
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.name
+
+
+class Discount(BaseModel):
+    discount_type = models.ForeignKey("DiscountType", related_name='discount_list', on_delete=models.CASCADE,
+                                      db_constraint=False, verbose_name="优惠类型")
+    condition = models.IntegerField(blank=True, default=0, verbose_name="满足优惠的条件", help_text="设置享受优惠的价格条件,如果不填或0则没有优惠门槛")
+    sale = models.TextField(verbose_name="优惠公式", help_text="""
+    0表示免费；<br>
+    *号开头表示折扣价，例如填写*0.82,则表示八二折；<br>
+    -号开头表示减免价, 例如填写-100,则表示减免100；<br>""")
+
+    class Meta:
+        db_table = "ol_discount"
+        verbose_name = "优惠公式"
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return "价格优惠：%s，优惠条件：%s，优惠公式：%s" % (self.discount_type.name, self.condition, self.sale)
+
+
+class CourseActivity(BaseModel):
+    activity = models.ForeignKey("Activity", related_name='price_list', on_delete=models.CASCADE,
+                                 db_constraint=False, verbose_name="活动")
+    course = models.ForeignKey("Course", related_name='price_list', on_delete=models.CASCADE,
+                               db_constraint=False, verbose_name="课程")
+    discount = models.ForeignKey("Discount", related_name='price_list', on_delete=models.CASCADE,
+                                 db_constraint=False, verbose_name="优惠")
+
+    class Meta:
+        db_table = "ol_course_activity_price"
+        verbose_name = "课程参与活动的价格表"
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return "活动：%s-课程：%s-优惠公式：%s" % (self.activity.name, self.course.name, self.discount.sale)

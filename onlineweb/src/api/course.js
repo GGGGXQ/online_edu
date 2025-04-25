@@ -21,7 +21,7 @@ const course = reactive({
     info: {           // 课程详情信息
         teacher:{},   // 课程相关的老师信息
         discount:{    // 课程相关的折扣信息
-          type: ""
+            type: "",
         }
     },
     tabIndex: 1,      // 课程详情页中默认展示的课程信息的选项卡
@@ -76,7 +76,7 @@ const course = reactive({
     },
     get_hot_word(){
         // 课程热搜关键字
-        return http.get("/courses/hot_word")
+        return http.get("/courses/hot_word/")
     },
     get_course(){
         return http.get(`/courses/${this.course_id}`)

@@ -436,8 +436,11 @@ SIMPLEUI_STATIC_OFFLINE = True
 # 首页图标地址
 SIMPLEUI_INDEX = "http://www.onlineedu.cn:5173/"
 
-# 忽略CKEditor警告
-SILENCED_SYSTEM_CHECKS = ['ckeditor.W001']
+# 忽略警告
+SILENCED_SYSTEM_CHECKS = [
+    'drf_haystack.W001',
+    'ckeditor.W001',
+]
 
 # haystack连接elasticsearch的配置信息
 HAYSTACK_CONNECTIONS = {
