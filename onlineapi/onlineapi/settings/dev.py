@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "home",
     "users",
     "courses",
+    "cart",
 ]
 
 MIDDLEWARE = [
@@ -303,6 +304,13 @@ CACHES = {
     "hot_word": {
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": "redis://:root@192.168.171.128:6379/3",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    },
+    "cart": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://:root@192.168.171.128:6379/4",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
