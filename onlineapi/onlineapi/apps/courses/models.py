@@ -316,7 +316,7 @@ class Discount(BaseModel):
         return "价格优惠：%s，优惠条件：%s，优惠公式：%s" % (self.discount_type.name, self.condition, self.sale)
 
 
-class CourseActivity(BaseModel):
+class CourseActivityPrice(BaseModel):
     activity = models.ForeignKey("Activity", related_name='price_list', on_delete=models.CASCADE,
                                  db_constraint=False, verbose_name="活动")
     course = models.ForeignKey("Course", related_name='price_list', on_delete=models.CASCADE,
