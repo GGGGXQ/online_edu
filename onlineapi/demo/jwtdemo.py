@@ -41,9 +41,14 @@ if __name__ == '__main__':
     # eyJ0eXAiOiAiand0IiwgImFsZyI6ICJIUzI1NiJ9.eyJzdWIiOiAicm9vdCIsICJleHAiOiAxNzQyNjI4MDkwLCAiaWF0IjogMTc0MjYyNDQ5MCwgIm5hbWUiOiAidGVzdG5hbWUiLCAiYXZhdGFyIjogIjEucG5nIiwgInVzZXJfaWQiOiAxLCAiYWRtaW4iOiB0cnVlLCAiYWNjX3B3ZCI6ICJRaUxDSmhiR2NpT2lKSVV6STFOaUo5UWlMQ0poYkdjaU9pSklVekkxTmlKOVFpTENKaGJHY2lPaUpJVXpJMU5pSjkifQ==.f3a2a791b12a752ea9d9acb11cfb76a973c7c314a02f93a4a48bb7b869ad0ed4
 
     # 验证
-    token2 = 'eyJ0eXAiOiAiand0IiwgImFsZyI6ICJIUzI1NiJ9.eyJzdWIiOiAicm9vdCIsICJleHAiOiAxNzQyNjI4MDkwLCAiaWF0IjogMTc0MjYyNDQ5MCwgIm5hbWUiOiAidGVzdG5hbWUiLCAiYXZhdGFyIjogIjEucG5nIiwgInVzZXJfaWQiOiAxLCAiYWRtaW4iOiB0cnVlLCAiYWNjX3B3ZCI6ICJRaUxDSmhiR2NpT2lKSVV6STFOaUo5UWlMQ0poYkdjaU9pSklVekkxTmlKOVFpTENKaGJHY2lPaUpJVXpJMU5pSjkifQ==.f3a2a791b12a752ea9d9acb11cfb76a973c7c314a02f93a4a48bb7b869ad0ed4'
-    header2, payload2, signatrue2 = token2.split('.')
-    # 是否过期
+    token2 = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ2MjY4NjAyLCJpYXQiOjE3NDU2NjM4MDIsImp0aSI6ImExNjRiZmU2ZDUwOTRjMjFiYTQ2MmQyNTI2MTJlODQxIiwidXNlcl9pZCI6MTUsImF2YXRhciI6Imh0dHBzOi8vb25saW5lZWR1Y2F0aW9ucHJvLm9zcy1jbi1iZWlqaW5nLmFsaXl1bmNzLmNvbS91cGxvYWRzL2F2YXRhci8yMDI1L2F2YXRhci5qcGciLCJuaWNrbmFtZSI6IiIsIm1vbmV5IjowLjAsImNyZWRpdCI6MH0.28eW2Bf4JqQgdORk2M8b68vHWSk7D7sfyA4HK3Ox6YI'
+    header2, payload2, signature2 = token2.split('.')  # 注意变量名拼写：signature2
+
+    # 补全 Base64 padding
+    missing_padding = len(payload2) % 4
+    if missing_padding:
+        payload2 += '=' * (4 - missing_padding)
+
     payload2_data = json.loads(base64.b64decode(payload2.encode()))
     print(payload2_data)
     exp = int(payload2_data.get("exp", None))

@@ -5,6 +5,9 @@ from django.contrib.auth.backends import ModelBackend, UserModel
 from django.db.models import Q
 from django_redis import get_redis_connection
 
+import logging
+logger = logging.getLogger('django')
+
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -18,6 +21,13 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             token['money'] = float(user.money)
         if hasattr(user, 'credit'):
             token['credit'] = user.credit
+        # 直接从 Redis 获取购物车数量并写入 Token payload
+        try:
+            redis = get_redis_connection("cart")
+            cart_total = redis.hlen(f"cart_{user.id}")
+            token['cart_total'] = cart_total
+        except Exception as e:
+            token['cart_total'] = 0  # 默认值
         return token
 
     def validate(self, attrs):
