@@ -25,7 +25,8 @@
           <div class="item-4 l"><span>操作</span></div>
         </div>
         <div class="cart-body-table">
-          <div class="item"  v-for="course_info in cart.course_list">
+          <!-- 删除操作，需要指定数组的下标 -->
+          <div class="item"  v-for="course_info, key in cart.course_list">
               <div class="item-1">
                   <el-checkbox v-model="course_info.selected" @change="change_select_course(course_info)"></el-checkbox>
               </div>
@@ -48,7 +49,14 @@
                       <div class="discount-price"><em>￥</em><span>{{course_info.price.toFixed(2)}}</span></div>
                   </div>
               </div>
-              <div class="item-4"><el-icon :size="26" class="close"><Close /></el-icon></div>
+              <div class="item-4">
+                <!-- 删除操作是不可逆操作，所以需要让用户确认是否真要删除 -->
+                <el-popconfirm title="您确认要从购物车删除当前课程吗？" @confirm="del_cart(key)" confirmButtonText="删除！" cancelButtonText="误操作！">
+                <template #reference>
+                  <el-icon :size="26" class="close"><Close /></el-icon>
+                </template>
+              </el-popconfirm>
+              </div>
           </div>
           <div class="cart-body-bot fixed">
             <div class=" cart-body-bot-box">
@@ -176,6 +184,21 @@ watch(
 onMounted(() => {
   get_cart();
 });
+
+const del_cart = (key)=>{
+    // 从购物车中删除商品课程
+    let token = localStorage.getItem('access') || sessionStorage.getItem('access');
+    let course = cart.course_list[key];
+    console.log("course", course)
+    cart.delete_course(course.id, token).then(response=>{
+        // 当课程的勾选状态为True时，删除课程以后，把已勾选状态的课程总数-1
+        cart.course_list.splice(key, 1);
+        // 在store中页要同步购物车商品总数量
+        store.commit("cart_total", cart.course_list.length);
+        // 重新计算购物车中的商品课程的总价格
+        get_cart_total();
+    })
+}
 
 </script>
 
