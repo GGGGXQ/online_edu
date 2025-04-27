@@ -60,12 +60,21 @@ const routes = [
   },
   {
     meta:{
-      title: "luffy2.0-购物车",
+      title: "在线教育-购物车",
       keepAlive: true
     },
     path: '/cart',
     name: "Cart",
     component: ()=> import("../views/Cart.vue"),
+  },
+  {
+    meta:{
+      title: "确认下单",
+      keepAlive: true
+    },
+    path: '/order',
+    name: "Order",
+    component: ()=> import("../views/Order.vue"),
   }
 ]
 
