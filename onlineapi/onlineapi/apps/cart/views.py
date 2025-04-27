@@ -137,34 +137,34 @@ class CartOrderAPIView(APIView):
     # 保证用户必须是登陆状态才能调用当前视图
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        """获取勾选商品列表"""
-        # 查询购物车中的商品课程ID列表
-        user_id = request.user.id
-        redis = get_redis_connection("cart")
-        cart_hash = redis.hgetall(f"cart_{user_id}")
-        """
-        cart_hash = {
-            # b'商品课程ID': b'勾选状态', 
-            b'2': b'1', 
-            b'4': b'1', 
-            b'5': b'1'
-        }
-        """
-        if len(cart_hash) < 1:
-            return Response({"message": "购物车没有任何商品。"}, status=status.HTTP_204_NO_CONTENT)
-        cart_list = [int(course_id.decode()) for course_id, selected in cart_hash.items() if selected == b'1']
-        course_list = Course.objects.filter(pk__in=cart_list, is_show=True, is_deleted=False).all()
-
-        # 把course_id进行遍历，提取课程中的信息组成列表
-        data = []
-        for course in course_list:
-            data.append({
-                "id": course.id,
-                "name": course.name,
-                "course_cover": course.course_cover.url,
-                "price": float(course.price),
-                "discount": course.discount,
-                "course_type": course.get_course_type_display(),
-            })
-        return Response({"message": "ok", "cart": data})
+    # def get(self, request):
+    #     """获取勾选商品列表"""
+    #     # 查询购物车中的商品课程ID列表
+    #     user_id = request.user.id
+    #     redis = get_redis_connection("cart")
+    #     cart_hash = redis.hgetall(f"cart_{user_id}")
+    #     """
+    #     cart_hash = {
+    #         # b'商品课程ID': b'勾选状态',
+    #         b'2': b'1',
+    #         b'4': b'1',
+    #         b'5': b'1'
+    #     }
+    #     """
+    #     if len(cart_hash) < 1:
+    #         return Response({"message": "购物车没有任何商品。"}, status=status.HTTP_204_NO_CONTENT)
+    #     cart_list = [int(course_id.decode()) for course_id, selected in cart_hash.items() if selected == b'1']
+    #     course_list = Course.objects.filter(pk__in=cart_list, is_show=True, is_deleted=False).all()
+    #
+    #     # 把course_id进行遍历，提取课程中的信息组成列表
+    #     data = []
+    #     for course in course_list:
+    #         data.append({
+    #             "id": course.id,
+    #             "name": course.name,
+    #             "course_cover": course.course_cover.url,
+    #             "price": float(course.price),
+    #             "discount": course.discount,
+    #             "course_type": course.get_course_type_display(),
+    #         })
+    #     return Response({"message": "ok", "cart": data})
