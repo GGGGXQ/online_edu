@@ -39,6 +39,9 @@ class Coupon(BaseModel):
         verbose_name = "优惠券"
         verbose_name_plural = verbose_name
 
+    def __str__(self):
+        return self.name
+
 
 class CouponDirection(models.Model):
     direction = models.ForeignKey(CourseDirection, on_delete=models.CASCADE, related_name="to_coupon",
@@ -51,6 +54,9 @@ class CouponDirection(models.Model):
         db_table = "ol_coupon_course_direction"
         verbose_name = "优惠券与学习方向"
         verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.direction.name
 
 
 class CouponCourseCat(models.Model):
@@ -76,6 +82,9 @@ class CouponCourse(models.Model):
         verbose_name = "优惠券与课程信息"
         verbose_name_plural = verbose_name
 
+    def __str__(self):
+        return self.course.name
+
 
 class CouponLog(BaseModel):
     use_choices = (
@@ -97,3 +106,6 @@ class CouponLog(BaseModel):
         db_table = "ol_coupon_log"
         verbose_name = "优惠券发放和使用日志"
         verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.name

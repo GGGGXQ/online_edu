@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'ckeditor',  # 富文本编辑器
     'ckeditor_uploader',  # 富文本编辑器上传文件子应用
     'stdimage',
+    'storages',
     'haystack',
 
     "home",
@@ -166,7 +167,8 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
-MEDIA_ROOT = BASE_DIR / "uploads"
+
+# MEDIA_ROOT = BASE_DIR / "uploads"
 # MEDIA_URL = "/uploads/"
 
 # Default primary key field type
@@ -317,6 +319,13 @@ CACHES = {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
     },
+    "coupon": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://:root@192.168.171.128:6379/5",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
 }
 
 # 设置用户登录admin站点时,记录登录状态的session保存到redis缓存中
@@ -343,24 +352,25 @@ TENCENT_CLOUD = {
 }
 
 # 阿里云OSS云存储
-
-OSS_ACCESS_KEY_ID = os.getenv("OSS_ACCESS_KEY_ID")
-OSS_ACCESS_KEY_SECRET = os.getenv("OSS_ACCESS_KEY_SECRET")
-OSS_ENDPOINT = os.getenv("OSS_ENDPOINT")
-OSS_BUCKET_NAME = os.getenv("OSS_BUCKET_NAME")
-
+ALIYUN_OSS_ACCESS_KEY_ID = os.getenv("OSS_ACCESS_KEY_ID")
+ALIYUN_OSS_ACCESS_KEY_SECRET = os.getenv("OSS_ACCESS_KEY_SECRET")
+ALIYUN_OSS_BUCKET_NAME = os.getenv("OSS_BUCKET_NAME")
+ALIYUN_OSS_ENDPOINT = os.getenv("OSS_ENDPOINT")
+ALIYUN_OSS_AUTO_CREATE_BUCKET = True  # 自动创建存储桶
 OSS = {
-    "ACCESS_KEY_ID": OSS_ACCESS_KEY_ID,
-    "ACCESS_KEY_SECRET": OSS_ACCESS_KEY_SECRET,
-    "ENDPOINT": OSS_ENDPOINT,
-    "BUCKET_NAME": OSS_BUCKET_NAME,
+    "ACCESS_KEY_ID": ALIYUN_OSS_ACCESS_KEY_ID,
+    "ACCESS_KEY_SECRET": ALIYUN_OSS_ACCESS_KEY_SECRET,
+    "ENDPOINT": ALIYUN_OSS_ENDPOINT,
+    "BUCKET_NAME": ALIYUN_OSS_BUCKET_NAME,
     "SSL": False,
 }
 
 # 添加配置后django-admin后台上传的ImageField, FileField等字段都会默认自动上传道oss的服务器中，访问路径也会自动替换
 # 注释后则访问路径为本地
-DEFAULT_FILE_STORAGE = 'django_oss_storage.backends.OssMediaStorage'
-MEDIA_URL = f"https://{OSS_BUCKET_NAME}.{OSS_ENDPOINT}/uploads/"
+# 图片访问路径
+MEDIA_URL = f"https://{ALIYUN_OSS_BUCKET_NAME}.{ALIYUN_OSS_ENDPOINT}/uploads/"
+DEFAULT_FILE_STORAGE = "storages.backends.aliyun_oss.OSSStorage"
+STATICFILES_STORAGE = "storages.backends.aliyun_oss.OSSStorage"
 
 # 容联云短信
 RONGLIANYUN = {

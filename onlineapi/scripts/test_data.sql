@@ -26,5 +26,26 @@ INSERT INTO online.ol_course_info (id, name, orders, is_show, is_deleted, create
 (19, 'MongoDB入门到进阶', 1, 1, 0, '2021-07-22 04:35:05.696823', '2021-07-22 04:35:05.696871', 'course/cover/course-19.png', '', 0, 0, '<p>MongoDB入门到进阶</p>', '2021-07-22', 7, 'luffycity-celery用法1.zip', null, 0, 11205, 86, 40, 1100.00, 0, 1, 62, 10, 3),
 (20, 'Redis入门课程', 1, 1, 0, '2021-07-22 04:35:05.696823', '2021-07-22 04:35:05.696871', 'course/cover/course-20.png', '', 0, 0, '<p>Redis入门课程</p>', '2021-07-22', 7, 'luffycity-celery用法1.zip', null, 0, 120, 100, 40, 1199.00, 1, 1, 61, 10, 2);
 
+
+-- 优惠券测试数据
+truncate table ol_coupon;
+INSERT INTO ol_coupon (id, name, is_deleted, orders, is_show, created_time, updated_time, discount, coupon_type, total, has_total, start_time, end_time, get_type, `condition`, per_limit, sale) VALUES (1, '30元通用优惠券', 0, 1, 1, '2022-05-04 10:35:40.569417', '2022-06-30 10:25:00.353212', 1, 0, 10000, 10000, '2022-05-04 10:35:00', '2023-01-02 10:35:00', 0, 100, 1, '-30'),(2, '前端学习通用优惠券', 0, 1, 1, '2022-05-04 10:36:58.401527', '2022-05-04 10:36:58.401556', 1, 1, 100, 100, '2022-05-04 10:36:00', '2022-08-04 10:36:00', 0, 0, 1, '-50'),(3, 'Typescript课程专用券', 0, 1, 1, '2022-05-04 10:38:36.134581', '2022-05-04 10:38:36.134624', 2, 3, 1000, 1000, '2022-05-04 10:38:00', '2022-08-04 10:38:00', 0, 0, 1, '*0.88'),(4, 'python七夕专用券', 0, 1, 1, '2022-05-04 10:40:08.022904', '2022-06-30 10:25:46.949197', 1, 2, 200, 200, '2022-05-04 10:39:00', '2022-11-15 10:39:00', 1, 0, 1, '-99'),(5, '算法学习优惠券', 0, 1, 1, '2021-08-05 10:05:07.837008', '2022-06-30 10:26:12.133812', 2, 2, 1000, 1000, '2022-08-05 10:04:00', '2022-12-25 10:04:00', 0, 200, 1, '*0.85');
+
+-- 优惠券与学习方向的关系测试数据
+truncate table ol_coupon_course_direction;
+INSERT INTO ol_coupon_course_direction (id, created_time, coupon_id, direction_id) VALUES (1, '2022-05-04 10:36:58.414461', 2, 1);
+
+-- 优惠券与课程分类的关系测试数据
+truncate table ol_coupon_course_category;
+INSERT INTO ol_coupon_course_category (id, created_time, category_id, coupon_id) VALUES (1, '2022-05-04 10:40:08.029505', 20, 4),(2, '2022-05-04 10:40:08.042891', 21, 4),(3, '2021-08-05 10:05:07.966221', 33, 5);
+
+-- 优惠券与课程信息的关系测试数据
+truncate table ol_coupon_course;
+INSERT INTO ol_coupon_course (id, created_time, coupon_id, course_id) VALUES (1, '2022-05-04 10:38:36.140929', 3, 1),(2, '2022-05-04 10:38:36.143166', 3, 2);
+
+-- 优惠券的发放和使用日志的测试数据
+truncate table ol_coupon_log;
+INSERT INTO ol_coupon_log (id, is_deleted, orders, is_show, created_time, updated_time, name, use_time, use_status, coupon_id, order_id, user_id) VALUES (5, 0, 1, 1, '2022-05-04 12:00:25.051976', '2022-06-30 10:25:17.681298', '30元通用优惠券222', null, 0, 1, null, 1),(8, 0, 1, 1, '2022-05-04 12:03:24.331024', '2022-06-30 10:22:45.834401', '前端学习通用优惠券', null, 0, 2, null, 1),(9, 0, 1, 1, '2022-05-04 12:03:31.692397', '2022-06-30 10:23:41.492205', 'Typescript课程专用券', null, 0, 3, null, 1),(10, 0, 1, 1, '2022-05-04 12:03:38.225438', '2022-06-30 10:25:49.797318', 'python七夕专用券', null, 0, 4, null, 1),(11, 0, 1, 1, '2022-05-04 12:09:25.406437', '2022-06-30 10:23:55.832262', '前端学习通用优惠券', null, 0, 2, null, 1),(12, 0, 1, 1, '2021-08-05 10:06:06.036230', '2022-06-30 10:26:20.723668', '算法学习优惠券', null, 0, 5, null, 1);
+
 # 如果当前数据库使用了物理外键，开启原来表中的主外键约束功能
 # set FOREIGN_KEY_CHECKS=1;

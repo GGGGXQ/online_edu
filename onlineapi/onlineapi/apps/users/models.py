@@ -24,7 +24,7 @@ class User(AbstractUser):
 
     def avatar_small(self):
         if self.avatar:
-            return format_html(f'<img style="border-radius: 100%;" src="{self.avatar.thumb_50x50.url}">')
+            return format_html(f'<img style="border-radius: 0%;"src="{self.avatar.thumb_50x50.url}">')
         return ""
 
     avatar_small.short_description = "个人头像(50x50)"
