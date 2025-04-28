@@ -201,7 +201,7 @@
               <p class="r rw price"><em>￥</em><span id="js-pay-price">1751.00</span></p>
               <p class="r price-text">应付：</p>
             </div>
-            <span class="r btn btn-red submit-btn">提交订单</span>
+            <span class="r btn btn-red submit-btn" @click="commit_order">提交订单</span>
 					</div>
           <div class="pay-add-sign">
             <ul class="clearfix">
@@ -222,20 +222,57 @@ import {reactive,watch} from "vue"
 import Header from "../components/Header.vue"
 import Footer from "../components/Footer.vue"
 import {useStore} from "vuex";
+import {ElMessage} from "element-plus";
 import cart from "../api/cart"
 import order from "../api/order";
+import router from "../router";
 
-// let store = useStore()
+let store = useStore()
 
 const get_select_course = ()=>{
     // 获取购物车中的勾选商品列表
-    let token = sessionStorage.token || localStorage.token;
-    cart.get_select_course(token).then(response=>{
+    let access = sessionStorage.access || localStorage.access;
+    cart.get_select_course(access).then(response=>{
         cart.select_course_list = response.data.cart
-    })
+        if(response.data.cart.length === 0){
+          ElMessage.error("当前购物车中没有下单的商品！请重新重新选择购物车中要购买的商品~");
+          router.back();
+        }
+    }).catch(error=>{
+    if(error?.response?.status===400){
+      ElMessage.error("登录超时！请重新登录后再继续操作~");
+    }
+  })
 }
 
 get_select_course();
+
+
+const commit_order = ()=>{
+    // 生成订单
+    let access = sessionStorage.access || localStorage.access;
+    order.create_order(access).then(response=>{
+    console.log(response.data.order_number)  // todo 订单号
+    console.log(response.data.pay_link)      // todo 支付链接
+    // 成功提示
+    ElMessage.success("下单成功！马上跳转到支付页面，请稍候~")
+    // 扣除掉被下单的商品数量，更新购物车中的商品数量
+    store.commit("set_cart_total", store.state.cart_total - cart.select_course_list.length);
+  }).catch(error=>{
+    if(error?.response?.status===400){
+          ElMessage.success("登录超时！请重新登录后再继续操作~");
+    }
+  })
+}
+
+
+// 监听用户选择的支付方式
+watch(
+    ()=>order.pay_type,
+    ()=>{
+      console.log(order.pay_type)
+    }
+)
 
 
 // 监听用户选择的支付方式
