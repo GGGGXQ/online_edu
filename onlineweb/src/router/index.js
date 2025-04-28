@@ -57,7 +57,26 @@ const routes = [
     path: '/project/:id',     // :id vue的路径参数，代表了课程的ID
     name: "Info",
     component: ()=> import("../views/Info.vue"),
-  }
+  },
+    {
+      meta:{
+        title: "在线教育-购物车",
+        keepAlive: true
+      },
+      path: '/cart',
+      name: "Cart",
+      component: ()=> import("../views/Cart.vue"),
+    },
+    {
+      meta:{
+        title: "确认下单",
+        keepAlive: true
+      },
+      path: '/order',
+      name: "Order",
+      component: ()=> import("../views/Order.vue"),
+    }
+
 ]
 
 // 路由对象实例化

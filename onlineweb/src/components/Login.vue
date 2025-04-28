@@ -1,9 +1,9 @@
 <template>
   <div class="title">
-    <span :class="{active:user.login_type==0}" @click="user.login_type=0">密码登录</span>
-    <span :class="{active:user.login_type==1}" @click="user.login_type=1">短信登录</span>
+    <span :class="{active:user.login_type===0}" @click="user.login_type=0">密码登录</span>
+    <span :class="{active:user.login_type===1}" @click="user.login_type=1">短信登录</span>
   </div>
-  <div class="inp" v-if="user.login_type==0">
+  <div class="inp" v-if="user.login_type===0">
     <input v-model="user.account" type="text" placeholder="用户名 / 手机号码" class="user">
     <input v-model="user.password" type="password" class="pwd" placeholder="密码">
     <div id="geetest1"></div>
@@ -14,14 +14,16 @@
       </label>
       <p>忘记密码</p>
     </div>
-     <button class="login_btn" @click="show_captcha">登录</button>
+<!--    <button class="login_btn" @click="show_captcha">登录</button>-->
+    <button class="login_btn" @click="loginhandler">登录</button>
     <p class="go_login" >没有账号 <router-link to="/register">立即注册</router-link></p>
   </div>
-  <div class="inp" v-show="user.login_type==1">
+  <div class="inp" v-show="user.login_type===1">
     <input v-model="user.mobile" type="text" placeholder="手机号码" class="user">
     <input v-model="user.code"  type="text" class="code" placeholder="短信验证码">
     <el-button id="get_code" type="primary" @click="send_sms">{{user.sms_btn_text}}</el-button>
-    <button class="login_btn" @click="show_captcha">登录</button>
+<!--    <button class="login_btn" @click="show_captcha">登录</button>-->
+    <button class="login_btn" @click="loginhandler">登录</button>
     <p class="go_login" >没有账号 <router-link to="/register">立即注册</router-link></p>
   </div>
 </template>
@@ -72,20 +74,21 @@ const loginhandler = ()=>{
     sessionStorage.removeItem("refresh");
     console.log(response.data.access);
     console.log(response.data.refresh);
-    // if(user.remember){ // 判断是否记住登录状态
-    //   // 记住登录
-    //   localStorage.access = response.data.access
-    //   localStorage.refresh = response.data.refresh
-    // }else{
-    //   // 不记住登录，关闭浏览器以后就删除状态
-    //   sessionStorage.access = response.data.access;
-    //   sessionStorage.refresh = response.data.refresh;
-    // }
+    if(user.remember){ // 判断是否记住登录状态
+      // 记住登录
+      localStorage.access = response.data.access
+      localStorage.refresh = response.data.refresh
+    }else{
+      // 不记住登录，关闭浏览器以后就删除状态
+      sessionStorage.access = response.data.access;
+      sessionStorage.refresh = response.data.refresh;
+    }
     // vuex 存储用户登录信息，保存token, 并根据用户的选择，是否记住密码
     let payload = response.data.access.split(".")[1]
     let payload_data = JSON.parse(atob(payload))
     console.log(payload_data)
     store.commit("login", payload_data);
+    store.commit("cart_total", response.data.cart_total)
 
     // 成功提示
     ElMessage.success("登录成功！");

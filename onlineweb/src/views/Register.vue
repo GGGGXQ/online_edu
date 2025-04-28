@@ -15,7 +15,8 @@
             <input v-model="user.re_password" type="password" placeholder="确认密码" class="user">
             <input v-model="user.code"  type="text" class="code" placeholder="短信验证码">
             <el-button id="get_code" type="primary" @click="send_sms">{{user.sms_btn_text}}</el-button>
-            <button class="login_btn" @click="show_captcha">注册</button>
+<!--            <button class="login_btn" @click="show_captcha">注册</button>-->
+            <button class="login_btn" @click="registerhandler">注册</button>
             <p class="go_login" >已有账号 <router-link to="/login">立即登录</router-link></p>
           </div>
       </div>

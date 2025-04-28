@@ -44,8 +44,7 @@
                 <button class="buy-now">立即购买</button>
                 <button class="free">免费试学</button>
               </div>
-              <el-popconfirm title="您确认添加当前课程加入购物车吗？" @confirm="add_cart" confirmButtonText="买买买！"
-                             cancelButtonText="误操作！">
+              <el-popconfirm title="您确认添加当前课程加入购物车吗？" @confirm="add_cart" confirmButtonText="买买买！" cancelButtonText="误操作！">
                 <template #reference>
                   <div class="add-cart"><img src="../assets/cart-yellow.svg" alt="">加入购物车</div>
                 </template>
@@ -120,20 +119,20 @@
 </template>
 
 <script setup>
-import {reactive, ref, watch} from "vue"
+import {reactive,ref, watch} from "vue"
 import {useRoute, useRouter} from "vue-router"
 import Header from "../components/Header.vue"
 import Footer from "../components/Footer.vue"
-import { AliPlayerV3 } from 'vue-aliplayer-v3'
+import { AliPlayerV3 } from "vue-aliplayer-v3"
 import course from "../api/course"
-// import cart from "../api/cart";
-import {ElMessage} from 'element-plus'
+import cart from "../api/cart";
+import { ElMessage } from 'element-plus'
 import {fill0} from "../utils/func";
 import {useStore} from "vuex";
 
 const store = useStore()
 let route = useRoute()
-let router = useRouter()
+let router= useRouter()
 let player = ref(null)
 
 // 获取url地址栏上的课程ID
@@ -141,9 +140,9 @@ course.course_id = route.params.id;
 
 
 // 简单判断课程ID是否合法
-if (course.course_id > 0) {
+if(course.course_id > 0){
   // 根据课程ID到服务端获取课程详情数据
-  course.get_course().then(response => {
+  course.get_course().then(response=> {
     course.info = response.data;
     clearInterval(course.timer);
     course.timer = setInterval(() => {
@@ -151,29 +150,29 @@ if (course.course_id > 0) {
         course.info.discount.expire--
       }
     }, 1000);
-  }).catch(error => {
+  }).catch(error=>{
     ElMessage.error({
       message: "非法的URL地址，无法获取课程信息！",
       duration: 1000,
-      onClose() {
+      onClose(){
         router.go(-1);
       }
     })
   })
 
   // 获取课程章节信息
-  course.get_course_chapters().then(response => {
+  course.get_course_chapters().then(response=>{
     course.chapter_list = response.data
   })
 
-} else {
-  ElMessage.error({
-    message: "非法的URL地址，无法获取课程信息！",
-    duration: 1000,
-    onClose() {
-      router.go(-1)
-    }
-  })
+}else{
+    ElMessage.error({
+      message: "非法的URL地址，无法获取课程信息！",
+      duration: 1000,
+      onClose(){
+        router.go(-1)
+      }
+    })
 }
 
 
@@ -187,39 +186,38 @@ const options = reactive({
   // format: 'm3u8'  // 切换为直播流的时候必填
 })
 
-const onPlay = (event) => {
+const onPlay = (event)=>{
   console.log("播放视频");
   console.log(player.value.getCurrentTime());  // 当前视频播放时间
 }
 
-const onPause = (event) => {
+const onPause = (event)=>{
   console.log("暂停播放");
   console.log(player.value.getCurrentTime());
 }
 
-const onPlaying = (event) => {
+const onPlaying = (event)=>{
   console.log("播放中");
   console.log(player.value.getCurrentTime());
   console.log(player.value.getDuration());  // 获取视频长度
 }
 
 
-// // 添加商品到购物车
-// let add_cart = () => {
-//   let token = sessionStorage.token || localStorage.token
-//   // 详情页中添加商品到购物车，不用传递参数，直接使用state.course来获取课程信息
-//   cart.add_course_to_cart(course.course_id, token).then(response => {
-//     store.commit("cart_total", response.data.cart_total)
-//     ElMessage.success(response.data.errmsg)
-//   }).catch(error => {
-//     if (error.response.status === 401) {
-//       store.commit("logout");
-//       ElMessage.error("您尚未登录或已登录超时，请登录后继续操作！");
-//     }
-//     ElMessage.error("添加商品到购物车失败！")
-//   })
-// }
-
+// 添加商品到购物车
+let add_cart = ()=>{
+  let token = sessionStorage.access || localStorage.access
+  // 详情页中添加商品到购物车，不用传递参数，直接使用state.course来获取课程信息
+  cart.add_course_to_cart(course.course_id, token).then(response=>{
+    store.commit("cart_total", response.data.cart_total)
+    ElMessage.success(response.data.errmsg)
+  }).catch(error=>{
+    if(error.response.status === 401){
+      store.commit("logout");
+      ElMessage.error("您尚未登录或已登录超时，请登录后继续操作！");
+    }
+    ElMessage.error("添加商品到购物车失败！")
+  })
+}
 
 
 </script>

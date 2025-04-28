@@ -40,6 +40,10 @@ export default createStore({
             state.user = {}
             localStorage.token = null;
             sessionStorage.token = null;
-        }
+        },
+        cart_total(state, total) {
+            // 设置商品数量的总数
+            state.cart_total = total
+        },
     }
 })

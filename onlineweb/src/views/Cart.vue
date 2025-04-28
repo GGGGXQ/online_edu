@@ -25,7 +25,6 @@
           <div class="item-4 l"><span>操作</span></div>
         </div>
         <div class="cart-body-table">
-          <!-- 删除操作，需要指定数组的下标 -->
           <div class="item"  v-for="course_info, key in cart.course_list">
               <div class="item-1">
                   <el-checkbox v-model="course_info.selected" @change="change_select_course(course_info)"></el-checkbox>
@@ -50,7 +49,6 @@
                   </div>
               </div>
               <div class="item-4">
-                <!-- 删除操作是不可逆操作，所以需要让用户确认是否真要删除 -->
                 <el-popconfirm title="您确认要从购物车删除当前课程吗？" @confirm="del_cart(key)" confirmButtonText="删除！" cancelButtonText="误操作！">
                 <template #reference>
                   <el-icon :size="26" class="close"><Close /></el-icon>
@@ -71,7 +69,7 @@
                       </span>
                     </div>
                   </div>
-                   <div class="li-3"><router-link to="/order" class="btn">去结算</router-link></div>
+                  <div class="li-3"><router-link to="/order" class="btn">去结算</router-link></div>
                 </div>
               </div>
             </div>
@@ -83,25 +81,22 @@
   </div>
 </template>
 
+
 <script setup>
 import {Close} from '@element-plus/icons-vue'
 import {reactive, watch} from "vue"
 import Header from "../components/Header.vue"
 import Footer from "../components/Footer.vue"
 import cart from "../api/cart"
-import { onMounted } from "vue";
 import { ElMessage } from 'element-plus'
-import { useStore } from "vuex";
-const store = useStore()
-let state = reactive({
-  checked: false,
-})
+import {useStore} from "vuex";
 
+const store = useStore()
 
 const get_cart = ()=>{
   // 获取购物车中的商品列表
-  let token = localStorage.getItem('access') || sessionStorage.getItem('access');
-  cart.get_course_from_cart(token).then(response=>{
+  let access = sessionStorage.access || localStorage.access;
+  cart.get_course_from_cart(access).then(response=>{
     cart.course_list = response.data.cart;
     // 获取购物车中的商品总价格
     get_cart_total();
@@ -113,6 +108,11 @@ const get_cart = ()=>{
       get_cart_total();
     },
   )
+
+  }).catch(error=>{
+    if(error?.response?.status===400){
+          ElMessage.error("登录超时！请重新登录后再继续操作~");
+    }
   })
 }
 
@@ -137,26 +137,24 @@ const get_cart_total = ()=>{
     cart.total_price = sum; // 购物车中的商品总价格
     cart.selected_course_total = select_sum; // 购物车中被勾选商品的数量
     cart.checked = select_sum === cart.course_list.length;  // 购物车中是否全选商品了
-  });
-  store.commit("cart_total", select_sum);
-  cart.total_price = sum;
-  cart.selected_course_total = select_sum;
-  cart.checked = select_sum === cart.course_list.length;
+  })
 }
+
 
 const change_select_course = (course)=>{
   // 切换指定课程的勾选状态
-  let token = localStorage.getItem('access') || sessionStorage.getItem('access');
-  cart.select_course(course.id, course.selected, token).catch(error=>{
+  let access = sessionStorage.access || localStorage.access;
+  cart.select_course(course.id, course.selected, access).catch(error=>{
     ElMessage.error(error?.response?.data?.errmsg);
   })
 }
+
 
 // 监听全选按钮的状态切换
 watch(
     ()=>cart.checked,
     ()=>{
-      let token = localStorage.getItem('access') || sessionStorage.getItem('access');
+      let access = sessionStorage.access || localStorage.access
       // 如果勾选了全选，则所有课程的勾选状态都为true
       if(cart.checked){
         // 让客户端的所有课程状态先改版
@@ -166,7 +164,7 @@ watch(
 
         // 如果是因为购物车中所有课程的勾选状态都为true的情况下，是不需要发送全选的ajax请求
         if(!(cart.selected_course_total === cart.course_list.length)){
-          cart.select_all_course(true, token);
+          cart.select_all_course(true, access);
         }
       }
 
@@ -175,22 +173,17 @@ watch(
         cart.course_list.forEach((course, key)=>{
           course.selected = false
         })
-        cart.select_all_course(false,token);
+        cart.select_all_course(false,access);
       }
     }
 )
 
-
-onMounted(() => {
-  get_cart();
-});
-
 const del_cart = (key)=>{
     // 从购物车中删除商品课程
-    let token = localStorage.getItem('access') || sessionStorage.getItem('access');
+    let access = sessionStorage.access || localStorage.access;
     let course = cart.course_list[key];
     console.log("course", course)
-    cart.delete_course(course.id, token).then(response=>{
+    cart.delete_course(course.id, access).then(response=>{
         // 当课程的勾选状态为True时，删除课程以后，把已勾选状态的课程总数-1
         cart.course_list.splice(key, 1);
         // 在store中页要同步购物车商品总数量
@@ -200,7 +193,9 @@ const del_cart = (key)=>{
     })
 }
 
+
 </script>
+
 
 <style scoped>
 .cart-header {

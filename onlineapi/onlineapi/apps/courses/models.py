@@ -40,9 +40,9 @@ class CourseCategory(BaseModel):
 
 class Course(BaseModel):
     course_type = (
-        (0, '付费购买'),
+        (0, '实战课程'),
         (1, '会员专享'),
-        (2, '限时免费'),
+        (2, '学位课程'),
     )
     level_choices = (
         (0, '初级'),

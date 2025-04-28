@@ -3,6 +3,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import authenticate
 from django.contrib.auth.backends import ModelBackend, UserModel
 from django.db.models import Q
+from django_redis import get_redis_connection
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -17,31 +18,19 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             token['money'] = float(user.money)
         if hasattr(user, 'credit'):
             token['credit'] = user.credit
+        try:
+            redis = get_redis_connection("cart")
+            token['cart_total'] = redis.hlen(f"cart_{user.id}")
+        except Exception as e:
+            token['cart_total'] = 0  # 或记录日志
         return token
 
-    def generate_jwt_tokens(self, user):
-        """
-        生成JWT令牌
-        """
-        refresh = self.get_token(user)
-        data = {
-            'refresh': str(refresh),
-            'access': str(refresh.access_token)
-        }
-        return data
-
     def validate(self, attrs):
-        username = attrs.get('username')
-        password = attrs.get('password')
-        user = authenticate(request=self.context.get('request'), username=username, password=password)
+        data = super().validate(attrs)
+        user = self.user
+        redis = get_redis_connection("cart")
+        data['cart_total'] = redis.hlen(f"cart_{user.id}")
 
-        if user is None:
-            raise serializers.ValidationError(
-                {"detail": "No active account found with the given credentials"}
-            )
-
-        self.user = user
-        data = self.generate_jwt_tokens(self.user)
         return data
 
 

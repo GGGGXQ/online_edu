@@ -49,14 +49,14 @@ class UserRegisterModelSerializer(serializers.ModelSerializer):
         except User.DoesNotExist:
             pass
         # todo 防水墙验证码
-        api = TencentCloudAPI()
-        result = api.captcha(
-            data.get("ticket"),
-            data.get("randstr"),
-            self.context['request']._request.META.get("REMOTE_ADDR")  # 客户端IP
-        )
-        if not result:
-            raise serializers.ValidationError(detail="滑块验证码校验失败！")
+        # api = TencentCloudAPI()
+        # result = api.captcha(
+        #     data.get("ticket"),
+        #     data.get("randstr"),
+        #     self.context['request']._request.META.get("REMOTE_ADDR")  # 客户端IP
+        # )
+        # if not result:
+        #     raise serializers.ValidationError(detail="滑块验证码校验失败！")
         # todo 验证短信验证码
         # 从redis中提取短信
         redis = get_redis_connection("sms_code")
