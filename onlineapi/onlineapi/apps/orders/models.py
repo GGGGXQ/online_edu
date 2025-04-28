@@ -20,6 +20,7 @@ class Order(BaseModel):
     total_price = models.DecimalField(default=0, max_digits=10, decimal_places=2, verbose_name="订单总价")
     real_price = models.DecimalField(default=0, max_digits=10, decimal_places=2, verbose_name="实付金额")
     order_number = models.CharField(max_length=64, verbose_name="订单号")
+    order_status = models.SmallIntegerField(choices=status_choices, default=0, verbose_name="订单状态")
     pay_type = models.SmallIntegerField(choices=pay_choices, default=1, verbose_name="支付方式")
     order_desc = models.TextField(null=True, blank=True, max_length=500, verbose_name="订单描述")
     pay_time = models.DateTimeField(null=True, blank=True, verbose_name="支付时间")
@@ -52,5 +53,5 @@ class OrderDetail(BaseModel):
         verbose_name = "订单详情"
         verbose_name_plural = verbose_name
 
-
-
+    def __str__(self):
+        return "%s" % self.course.name

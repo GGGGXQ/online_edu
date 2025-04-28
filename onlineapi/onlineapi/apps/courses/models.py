@@ -3,7 +3,7 @@ from ckeditor.fields import RichTextField  # 不支持上传文件
 from ckeditor_uploader.fields import RichTextUploadingField  # 支持上传文件
 from stdimage import StdImageField
 from django.utils.html import format_html
-from django.utils import timezone as datetime
+from django.utils import timezone
 import json
 
 
@@ -122,7 +122,7 @@ class Course(BaseModel):
     @property
     def discount(self):
         """通过计算获取当前课程的折扣优惠相关的信息"""
-        now_time = datetime.now()
+        now_time = timezone.now()
         last_activity_log = (self.price_list.filter(activity__end_time__gt=now_time, activity__start_time__lt=now_time)
                              .order_by("-id").first())
 
@@ -303,8 +303,8 @@ class CourseLesson(BaseModel):
 
 
 class Activity(BaseModel):
-    start_time = models.DateTimeField(default=datetime.now(), verbose_name="开始时间")
-    end_time = models.DateTimeField(default=datetime.now(), verbose_name="结束时间")
+    start_time = models.DateTimeField(default=timezone.now, verbose_name="开始时间")
+    end_time = models.DateTimeField(default=timezone.now, verbose_name="结束时间")
     description = RichTextUploadingField(blank=True, null=True, verbose_name="活动介绍")
     remark = models.TextField(blank=True, null=True, verbose_name="备注信息")
 
