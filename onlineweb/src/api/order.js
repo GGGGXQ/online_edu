@@ -3,6 +3,7 @@ import {reactive} from "vue";
 
 const order = reactive({
   total_price: 0,      // 勾选商品的总价格
+  discount_price: 0,   // 本次下单的优惠抵扣价格
   use_coupon: false,   // 用户是否使用优惠
   discount_type: 0,    // 0表示优惠券，1表示积分
   coupon_list:[1,2,3], // 用户拥有的可用优惠券列表
@@ -15,6 +16,14 @@ const order = reactive({
     return http.post("/orders/",{
         pay_type: this.pay_type
     },{
+        headers:{
+            Authorization: `Bearer ${token}`
+        }
+    })
+  },
+  get_enable_coupon_list(token){
+  // 获取本次下单的可用优惠券列表
+    return http.get("/coupon/enable/",{
         headers:{
             Authorization: `Bearer ${token}`
         }
