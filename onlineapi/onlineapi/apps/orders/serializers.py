@@ -2,10 +2,8 @@ from datetime import datetime
 from rest_framework import serializers
 from django_redis import get_redis_connection
 from django.db import transaction
-
 from .models import Order, OrderDetail, Course
 from coupon.models import CouponLog
-
 import logging
 
 logger = logging.getLogger("django")
@@ -26,45 +24,52 @@ class OrderModelSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         """创建订单"""
         redis = get_redis_connection("cart")
-        user_id = self.context["request"].user.id
+        user_id = self.context["request"].user.id  # 1
 
         # 判断用户如果使用了优惠券，则优惠券需要判断验证
         user_coupon_id = validated_data.get("user_coupon_id")
+        # 本次下单时，用户使用的优惠券
         user_coupon = None
         if user_coupon_id != -1:
             user_coupon = CouponLog.objects.filter(pk=user_coupon_id, user_id=user_id).first()
 
         # 开启事务操作，保证下单过程中的所有数据库的原子性
         with transaction.atomic():
+            # 设置事务的回滚点标记
             t1 = transaction.savepoint()
             try:
                 # 创建订单记录
                 order = Order.objects.create(
                     name="购买课程",  # 订单标题
                     user_id=user_id,  # 当前下单的用户ID
-                    order_number=datetime.now().strftime("%Y%m%d") + ("%08d" % user_id) + "%08d" % redis.incr("order_number"),
+                    # order_number = datetime.now().strftime("%Y%m%d%H%M%S") + ("%08d" % user_id) + "%08d" % random.randint(1,99999999) # 基于随机数生成唯一订单号
+                    order_number=datetime.now().strftime("%Y%m%d") + ("%08d" % user_id) + "%08d" % redis.incr("order_number"), # 基于redis生成分布式唯一订单号
                     pay_type=validated_data.get("pay_type"),  # 支付方式
                 )
 
-                # 记录本次下单的商品
+                # 记录本次下单的商品列表
                 cart_hash = redis.hgetall(f"cart_{user_id}")
                 if len(cart_hash) < 1:
                     raise serializers.ValidationError(detail="购物车没有要下单的商品")
+
+                # 提取购物车中所有勾选状态为b'1'的商品
                 course_id_list = [int(key.decode()) for key, value in cart_hash.items() if value == b'1']
+
                 # 添加订单与课程的关系
                 course_list = Course.objects.filter(pk__in=course_id_list, is_deleted=False, is_show=True).all()
                 detail_list = []
-                total_price = 0
-                real_price = 0
+                total_price = 0 # 本次订单的总价格
+                real_price = 0  # 本次订单的实付总价
+
                 # 用户使用优惠券或积分以后，需要在服务端计算本次使用优惠券或积分的最大优惠额度
-                total_discount_price = 0  # 总优惠价格
+                total_discount_price = 0    # 总优惠价格
                 max_discount_course = None  # 享受最大优惠的课程
 
                 for course in course_list:
-                    discount_price = float(course.discount.get("price", None))  # 获取课程原价
+                    discount_price = course.discount.get("price", None)  # 获取课程原价
                     if discount_price is not None:
                         discount_price = float(discount_price)
-                    discount_name = float(course.discount.get("type", ""))
+                    discount_name = course.discount.get("type", "")
                     detail_list.append(OrderDetail(
                         order=order,
                         course=course,
@@ -85,6 +90,7 @@ class OrderModelSerializer(serializers.ModelSerializer):
                         else:
                             if course.price >= max_discount_course.price:
                                 max_discount_course = course
+
                 # 在用户使用了优惠券以后，根据循环中得到的最佳优惠课程进行计算最终抵扣金额
                 if user_coupon:
                     # 优惠公式
@@ -93,26 +99,29 @@ class OrderModelSerializer(serializers.ModelSerializer):
                         """减免优惠券"""
                         total_discount_price = sale
                     elif user_coupon.coupon.discount == 2:
-                        total_discount_price = float(max_discount_course.price) * (1- sale)
+                        """折扣优惠券"""
+                        total_discount_price = float(max_discount_course.price) * (1 - sale)
 
                 # 一次性批量添加本次下单的商品记录
                 OrderDetail.objects.bulk_create(detail_list)
 
                 # 保存订单的总价格和实付价格
-                order.total_price = total_price
-                order.real_price = float(real_price - total_discount_price)
+                order.total_price = real_price
+                order.real_price =  float(real_price - total_discount_price)
                 order.save()
 
-                # todo 支付链接地址【后面实现支付功能】
+                # todo 支付链接地址[后面实现支付功能的时候，再做]
                 order.pay_link = ""
 
                 # 删除购物车中被勾选的商品，保留没有被勾选的商品信息
                 cart = {key: value for key, value in cart_hash.items() if value == b'0'}
                 pipe = redis.pipeline()
                 pipe.multi()
-                # 删除原来购物车
+                # 删除原来的购物车
                 pipe.delete(f"cart_{user_id}")
-                pipe.hset(f"cart_{user_id}", cart)
+                # 重新把未勾选的商品记录到购物车中
+                if cart:  # 判断如果是空购物，则不需要再次添加cart购物车数据了。
+                    pipe.hset(f"cart_{user_id}", cart)
                 pipe.execute()
 
                 # 如果有使用了优惠券，则把优惠券和当前订单进行绑定
@@ -123,8 +132,12 @@ class OrderModelSerializer(serializers.ModelSerializer):
                     print(f"{user_id}:{user_coupon_id}")
                     redis = get_redis_connection("coupon")
                     redis.delete(f"{user_id}:{user_coupon_id}")
+
                 return order
             except Exception as e:
+                # 1. 记录日志
                 logger.error(f"订单创建失败：{e}")
+                # 2. 事务回滚
                 transaction.savepoint_rollback(t1)
+                # 3. 抛出异常，通知视图返回错误提示
                 raise serializers.ValidationError(detail="订单创建失败！")

@@ -232,7 +232,7 @@ const commit_order = ()=>{
     if(order.select !== -1){
         user_coupon_id = order.coupon_list[order.select].user_coupon_id;
     }
-    order.create_order(access).then(response=>{
+    order.create_order(access, user_coupon_id).then(response=>{
     console.log(response.data.order_number)  // todo 订单号
     console.log(response.data.pay_link)      // todo 支付链接
     // 成功提示

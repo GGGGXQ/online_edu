@@ -1,4 +1,5 @@
 from models import models, BaseModel
+from django_oss_storage.backends import OssMediaStorage
 from ckeditor.fields import RichTextField  # 不支持上传文件
 from ckeditor_uploader.fields import RichTextUploadingField  # 支持上传文件
 from stdimage import StdImageField
@@ -60,7 +61,7 @@ class Course(BaseModel):
         'thumb_1080x608': (1080, 608),  # 高清图
         'thumb_540x304': (540, 304),  # 中等比例,
         'thumb_108x61': (108, 61, True),  # 小图(第三个参数表示保持图片质量),
-    }, max_length=255, delete_orphans=True, upload_to="course/cover", null=True, verbose_name="封面图片", blank=True)
+    }, max_length=255, delete_orphans=True, upload_to="course/cover", null=True, verbose_name="封面图片", blank=True, storage=OssMediaStorage())
     course_video = models.FileField(upload_to="course/video", max_length=255, verbose_name="课程视频", blank=True,
                                     null=True)
     course_type = models.SmallIntegerField(choices=course_type, default=0, verbose_name="付费类型")
@@ -186,7 +187,7 @@ class Teacher(BaseModel):
         'thumb_800x800': (800, 800),  # 'large': (800, 800),
         'thumb_400x400': (400, 400),  # 'medium': (400, 400),
         'thumb_50x50': (50, 50, True),  # 'small': (50, 50, True),
-    }, delete_orphans=True, upload_to="teacher", null=True, verbose_name="讲师头像")
+    }, delete_orphans=True, upload_to="teacher", null=True, verbose_name="讲师头像", storage=OssMediaStorage())
     brief = RichTextField(max_length=1024, verbose_name="讲师描述")
 
     class Meta:

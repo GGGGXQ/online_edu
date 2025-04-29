@@ -1,8 +1,10 @@
+from django_oss_storage.backends import OssMediaStorage
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.html import format_html
 
 from stdimage import StdImageField
+from django_oss_storage.backends import OssMediaStorage
 
 
 # Create your models here.
@@ -14,7 +16,7 @@ class User(AbstractUser):
     avatar = StdImageField(variations={
         'thumb_400x400': (400, 400),  # 'medium': (400, 400),
         'thumb_50x50': (50, 50, True),  # 'small': (50, 50, True),
-    }, delete_orphans=True, upload_to="avatar/%Y", blank=True, null=True, verbose_name="个人头像")
+    }, delete_orphans=True, upload_to="avatar/%Y", blank=True, null=True, verbose_name="个人头像", storage=OssMediaStorage())
     nickname = models.CharField(max_length=50, default="", null=True, verbose_name="用户昵称")
 
     class Meta:

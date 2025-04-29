@@ -7,7 +7,7 @@
           <div class="cart-title left">
             <h1 class="left">我的购物车</h1>
             <div class="left">
-              共<span>{{cart.course_list.length}}</span>门，已选择<span>{{cart.selected_course_total}}</span>门
+              共<span>{{cart && cart.course_list ? cart.course_list.length : 0}}</span>门，已选择<span>{{cart.selected_course_total}}</span>门
             </div>
           </div>
           <div class="right">
