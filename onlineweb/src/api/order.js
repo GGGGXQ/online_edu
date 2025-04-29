@@ -6,7 +6,7 @@ const order = reactive({
   discount_price: 0,   // 本次下单的优惠抵扣价格
   use_coupon: false,   // 用户是否使用优惠
   discount_type: 0,    // 0表示优惠券，1表示积分
-  coupon_list:[1,2,3], // 用户拥有的可用优惠券列表
+  coupon_list:[], // 用户拥有的可用优惠券列表
   select: -1,          // 当前用户选中的优惠券下标，-1表示没有选择
   credit: 0,           // 当前用户选择抵扣的积分，0表示没有使用积分
   fixed: true,         // 底部订单总价是否固定浮动
@@ -14,7 +14,8 @@ const order = reactive({
   create_order(token){
     // 生成订单
     return http.post("/orders/",{
-        pay_type: this.pay_type
+        pay_type: this.pay_type,
+        user_coupon_id,
     },{
         headers:{
             Authorization: `Bearer ${token}`

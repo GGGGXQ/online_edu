@@ -227,6 +227,11 @@ get_select_course();
 const commit_order = ()=>{
     // 生成订单
     let access = sessionStorage.access || localStorage.access;
+    // 当用户选择了优惠券，则需要获取当前选择的优惠券发放记录的id
+    let user_coupon_id = -1;
+    if(order.select !== -1){
+        user_coupon_id = order.coupon_list[order.select].user_coupon_id;
+    }
     order.create_order(access).then(response=>{
     console.log(response.data.order_number)  // todo 订单号
     console.log(response.data.pay_link)      // todo 支付链接
