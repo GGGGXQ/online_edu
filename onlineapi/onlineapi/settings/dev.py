@@ -13,10 +13,11 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 import sys, os
 import datetime
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+load_dotenv(BASE_DIR / ".env")
 sys.path.insert(0, str(BASE_DIR / "apps"))
 sys.path.insert(0, str(BASE_DIR / "utils"))
 
@@ -47,7 +48,7 @@ INSTALLED_APPS = [
     'ckeditor',  # 富文本编辑器
     'ckeditor_uploader',  # 富文本编辑器上传文件子应用
     'stdimage',
-    'storages',
+    'django_oss_storage',
     'haystack',
 
     "home",
@@ -161,10 +162,10 @@ USE_TZ = False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
-
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / "static_collected"  # 静态文件收集目标目录
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
+    BASE_DIR / "static",  # 开发时存放的静态文件目录
 ]
 
 
@@ -352,25 +353,27 @@ TENCENT_CLOUD = {
 }
 
 # 阿里云OSS云存储
-ALIYUN_OSS_ACCESS_KEY_ID = os.getenv("OSS_ACCESS_KEY_ID")
-ALIYUN_OSS_ACCESS_KEY_SECRET = os.getenv("OSS_ACCESS_KEY_SECRET")
-ALIYUN_OSS_BUCKET_NAME = os.getenv("OSS_BUCKET_NAME")
-ALIYUN_OSS_ENDPOINT = os.getenv("OSS_ENDPOINT")
-ALIYUN_OSS_AUTO_CREATE_BUCKET = True  # 自动创建存储桶
+OSS_ACCESS_KEY_ID = os.getenv("OSS_ACCESS_KEY_ID")
+OSS_ACCESS_KEY_SECRET = os.getenv("OSS_ACCESS_KEY_SECRET")
+OSS_ENDPOINT = os.getenv("OSS_ENDPOINT")
+OSS_BUCKET_NAME = os.getenv("OSS_BUCKET_NAME")
+print("OSS_ACCESS_KEY_ID:", OSS_ACCESS_KEY_ID)
+print("OSS_ACCESS_KEY_SECRET:", OSS_ACCESS_KEY_SECRET)
+print("OSS_ENDPOINT:", OSS_ENDPOINT)
+print("OSS_BUCKET_NAME:", OSS_BUCKET_NAME)
+
 OSS = {
-    "ACCESS_KEY_ID": ALIYUN_OSS_ACCESS_KEY_ID,
-    "ACCESS_KEY_SECRET": ALIYUN_OSS_ACCESS_KEY_SECRET,
-    "ENDPOINT": ALIYUN_OSS_ENDPOINT,
-    "BUCKET_NAME": ALIYUN_OSS_BUCKET_NAME,
+    "ACCESS_KEY_ID": OSS_ACCESS_KEY_ID,
+    "ACCESS_KEY_SECRET": OSS_ACCESS_KEY_SECRET,
+    "ENDPOINT": OSS_ENDPOINT,
+    "BUCKET_NAME": OSS_BUCKET_NAME,
     "SSL": False,
 }
 
 # 添加配置后django-admin后台上传的ImageField, FileField等字段都会默认自动上传道oss的服务器中，访问路径也会自动替换
 # 注释后则访问路径为本地
-# 图片访问路径
-MEDIA_URL = f"https://{ALIYUN_OSS_BUCKET_NAME}.{ALIYUN_OSS_ENDPOINT}/uploads/"
-DEFAULT_FILE_STORAGE = "storages.backends.aliyun_oss.OSSStorage"
-STATICFILES_STORAGE = "storages.backends.aliyun_oss.OSSStorage"
+DEFAULT_FILE_STORAGE = 'django_oss_storage.backends.OssMediaStorage'
+MEDIA_URL = f"https://{OSS_BUCKET_NAME}.{OSS_ENDPOINT}/uploads/"
 
 # 容联云短信
 RONGLIANYUN = {
