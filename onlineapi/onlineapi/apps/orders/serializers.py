@@ -11,15 +11,15 @@ logger = logging.getLogger("django")
 
 
 class OrderModelSerializer(serializers.ModelSerializer):
-    pay_link = serializers.CharField(read_only=True)
     user_coupon_id = serializers.IntegerField(write_only=True, default=-1)
 
     class Meta:
         model = Order
-        fields = ["pay_type", "id", "order_number", "pay_link", "user_coupon_id"]
+        fields = ["pay_type", "id", "order_number", "user_coupon_id", "credit"]
         read_only_fields = ["id", "order_number"]
         extra_kwargs = {
             "pay_type": {"write_only": True},
+            "credit": {"write_only": True},
         }
 
     def create(self, validated_data):
@@ -131,9 +131,6 @@ class OrderModelSerializer(serializers.ModelSerializer):
                 order.total_price = real_price
                 order.real_price =  float(real_price - total_discount_price)
                 order.save()
-
-                # todo 支付链接地址[后面实现支付功能的时候，再做]
-                order.pay_link = ""
 
                 # 删除购物车中被勾选的商品，保留没有被勾选的商品信息
                 cart = {key: value for key, value in cart_hash.items() if value == b'0'}
