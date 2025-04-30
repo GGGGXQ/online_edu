@@ -19,10 +19,13 @@
         <div class="cart-body-table">
           <div class="item" v-for="course_info in cart.select_course_list">
               <div class="item-2">
-                  <router-link :to="`/project/${course_info.id}`" class="img-box l"><img :src="course_info.course_cover"></router-link>
+                  <router-link :to="`/project/${course_info.id}`" class="img-box l">
+                    <img :src="course_info.course_cover">
+                  </router-link>
                   <dl class="l has-package">
-                    <dt>【{{course_info.course_type}}】{{course_info.name}} </dt>
-                    <p class="package-item" v-if="course_info.discount.type">{{course_info.discount.type}}</p>
+                    <dt>【{{course_info.course_type}}】 {{course_info.name}}</dt>
+                    <p class="package-item" v-if="course_info.discount.type">{{ course_info.discount.type }}</p>
+                    <p class="package-item" v-if="course_info.credit>0">{{course_info.credit}}积分抵扣</p>
                   </dl>
               </div>
               <div class="item-3">
@@ -251,7 +254,9 @@ const commit_order = ()=>{
 const get_enable_coupon_list = ()=>{
     let access = sessionStorage.access || localStorage.access;
     order.get_enable_coupon_list(access).then(response=>{
-        order.coupon_list = response.data
+        order.coupon_list = response.data.coupon_list;
+        order.credit_to_money = response.data.credit_to_money;
+        order.has_credit = response.data.has_credit;
     })
 }
 

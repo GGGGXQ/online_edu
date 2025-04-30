@@ -1,3 +1,4 @@
+import constants
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -22,4 +23,9 @@ class EnableCouponListAPIView(APIView):
         """获取用户本次拥有的本次下单的所有可用优惠券"""
         user_id = request.user.id
         coupon_data = get_user_enable_coupon_list(user_id)
-        return Response(coupon_data)
+        return Response({
+            "errmsg": "ok",
+            'has_credit': request.user.credit,
+            'credit_to_money': constants.CREDIT_TO_MONEY,
+            "coupon_list": coupon_data
+        })
