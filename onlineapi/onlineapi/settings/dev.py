@@ -473,7 +473,7 @@ HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 # 支付宝相关配置
 ALIPAY = {
     # 'gateway': 'https://openapi.alipay.com/gateway.do',   # 真实网关地址
-    'gateway': 'https://openapi.alipaydev.com/gateway.do',  # 沙箱网关地址
+    'gateway': 'https://openapi-sandbox.dl.alipaydev.com/gateway.do',  # 沙箱网关地址
     'appid': '2021000148642068',  # 支付应用ID
     'sign_type': 'RSA2',  # 签证的加密算法
     'debug': True,  # 沙箱模式下必须设置为True

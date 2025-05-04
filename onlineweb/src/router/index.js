@@ -75,6 +75,15 @@ const routes = [
       path: '/order',
       name: "Order",
       component: ()=> import("../views/Order.vue"),
+    },
+    {
+      meta:{
+        title: "支付成功",
+        keepAlive: true
+      },
+      path: '/alipay',
+      name: "PaySuccess",
+      component: ()=> import("../views/AliPaySuccess.vue"),
     }
 
 ]

@@ -254,6 +254,10 @@ const commit_order = ()=>{
     ElMessage.success("下单成功！马上跳转到支付页面，请稍候~")
     // 扣除掉被下单的商品数量，更新购物车中的商品数量
     store.commit("set_cart_total", store.state.cart_total - cart.select_course_list.length);
+    // 根据订单号到服务端获取支付链接，并打开支付页面。
+    order.alipay_page_pay(response.data.order_number).then(response=>{
+            window.open(response.data.link,"_blank");
+    })
   }).catch(error=>{
     if(error?.response?.status===400){
           ElMessage.success("登录超时！请重新登录后再继续操作~");

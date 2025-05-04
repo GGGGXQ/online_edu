@@ -24,7 +24,7 @@ class AlipayAPIViewSet(ViewSet):
 
         # 创建alipay SDK操作对象
         alipay = AliPay(appid=settings.ALIPAY["appid"],
-                        app_notify_url=settings.ALIPAY["app_notify_url"],  # 默认全局回调url
+                        app_notify_url=settings.ALIPAY["notify_url"],  # 默认全局回调url
                         app_private_key_string=app_private_key_string,
                         alipay_public_key_string=alipay_public_key_string,  # 支付宝的公钥，验证支付宝回传消息使用，不是你自己的公钥,
                         sign_type=settings.ALIPAY["sign_type"],  # RSA2
