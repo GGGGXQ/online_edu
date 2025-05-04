@@ -23,6 +23,12 @@ const order = reactive({
   loading: false,      // 订单支付时的倒计时背景遮罩层
   timeout: 0,          // 订单支付超时倒计时
   timer: 0,            // 订单支付倒计时定时器的标记符
+  order_status: -1,    // 个人中心的默认显示的订单状态选项
+  order_status_choices:[], // 个人中心的订单支付状态选项
+  page: 1,                 // 个人中心的订单列表对应的页码
+  size: 5,                 // 个人中心的订单列表对应的单页数据量
+  order_list:[],           // 个人中心的订单列表
+  count: 0,                // 个人中心的订单列表的总数据量
   create_order(token, user_coupon_id){
     // 生成订单
     return http.post("/orders/",{
@@ -58,7 +64,24 @@ const order = reactive({
         Authorization: `Bearer ${token}`
       }
     })
-  }
+  },
+  get_order_status(){
+        // 获取订单状态选项
+        return http.get('/orders/pay/status/')
+  },
+  get_order_list(token){
+        // 获取当前登录用户的订单列表[分页显示]
+        return http.get('/orders/list/', {
+            params: {
+                page: this.page,
+                size: this.size,
+                status: this.order_status,
+            },
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+    }
 })
 
 export default order;
