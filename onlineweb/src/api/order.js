@@ -10,6 +10,7 @@ const order = reactive({
   course_list: [],     // 本次购买的商品课程列表
   real_price: 0,       // 付款金额
   pay_time: undefined, // 付款时间
+  order_number: null,  // 订单号
   is_show: false,      // 是否展示支付成功内容
   select: -1,          // 当前用户选中的优惠券下标，-1表示没有选择
   credit: 0,           // 当前用户选择抵扣的积分，0表示没有使用积分
@@ -19,6 +20,9 @@ const order = reactive({
   has_credit: 0,       // 用户拥有的积分
   max_use_credit: 0,   // 当前用户本次下单可用最大积分数量
   credit_course_list:[], // 可使用积分抵扣的课程列表
+  loading: false,      // 订单支付时的倒计时背景遮罩层
+  timeout: 0,          // 订单支付超时倒计时
+  timer: 0,            // 订单支付倒计时定时器的标记符
   create_order(token, user_coupon_id){
     // 生成订单
     return http.post("/orders/",{
@@ -46,6 +50,14 @@ const order = reactive({
   relay_alipay_result(query_string){
         // 把地址栏中的查询字符串(支付成功以后的同步回调通知)转发给服务端
         return http.get(`/payments/alipay/result/${query_string}`)
+  },
+  query_order(token){
+    // 查询订单支付结果
+    return http.get(`/payments/alipay/query/${this.order_number}`,{
+      headers:{
+        Authorization: `Bearer ${token}`
+      }
+    })
   }
 })
 

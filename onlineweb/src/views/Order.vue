@@ -180,6 +180,13 @@
 	      </div>
       </div>
     </div>
+    <div class="loadding" v-if="order.loading" @click="check_order">
+      <div class="box">
+          <p class="time">{{fill0(parseInt(order.timeout/60))}}:{{ fill0(order.timeout%60)}}</p>
+          <i class="el-icon-loading"></i><br>
+          <p>支付完成！点击关闭当前页面</p>
+      </div>
+    </div>
     <Footer/>
   </div>
 </template>
@@ -192,7 +199,10 @@ import {useStore} from "vuex";
 import {ElMessage} from "element-plus";
 import cart from "../api/cart"
 import order from "../api/order";
-import router from "../router";
+import {useRouter} from "vue-router";
+import {fill0} from "../utils/func";
+import router from "../router/index.js";
+
 
 let store = useStore()
 
@@ -289,6 +299,18 @@ const max_conver_credit = ()=>{
   conver_credit();
 }
 
+// 查询订单状态
+const check_order = ()=>{
+  let access = sessionStorage.access || localStorage.access;
+  order.query_order(access).then(response=>{
+    order.loading = false;
+    router.push("/user/order");
+  }).catch(error=>{
+    console.log(error);
+    ElMessage.error(error.response.data.errmsg);
+  })
+}
+
 
 // 监听用户选择的支付方式
 watch(
@@ -383,6 +405,35 @@ window.onscroll = ()=>{
 </script>
 
 <style scoped>
+.loadding{
+  width: 100%;
+  height: 100%;
+  margin: auto;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+  background-color: rgba(0,0,0,.7);
+}
+.box{
+  width: 300px;
+  height: 150px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  font-size: 40px;
+  text-align: center;
+  padding-top: 50px;
+  color: #fff;
+}
+.box .time{
+  font-size: 22px;
+}
 .cart-header {
   height: 160px;
   background-color: #e3e6e9;
