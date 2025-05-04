@@ -1,3 +1,5 @@
+import constants
+
 from models import BaseModel, models
 from django.db import models
 from django.contrib.auth.models import AbstractUser
@@ -5,6 +7,8 @@ from django.utils.html import format_html
 
 from stdimage import StdImageField
 from django_oss_storage.backends import OssMediaStorage
+
+from courses.models import Course, CourseChapter, CourseLesson
 
 
 # Create your models here.
@@ -17,8 +21,9 @@ class User(AbstractUser):
         'thumb_400x400': (400, 400),  # 'medium': (400, 400),
         'thumb_50x50': (50, 50, True),  # 'small': (50, 50, True),
     }, delete_orphans=True, upload_to="avatar/%Y", blank=True, null=True, verbose_name="个人头像",
-        storage=OssMediaStorage())
+        storage=OssMediaStorage(), default=constants.DEFAULT_USER_AVATAR,)
     nickname = models.CharField(max_length=50, default="", null=True, verbose_name="用户昵称")
+    study_time = models.IntegerField(default=0, verbose_name="总学习时长")
 
     class Meta:
         db_table = 'ol_users'
@@ -59,7 +64,7 @@ class Credit(BaseModel):
     remark = models.CharField(max_length=500, null=True, blank=True, verbose_name="备注信息")
 
     class Meta:
-        db_table = 'ly_credit'
+        db_table = 'ol_credit'
         verbose_name = '积分流水'
         verbose_name_plural = verbose_name
 
@@ -72,3 +77,17 @@ class Credit(BaseModel):
             self.get_operation_display(), self.created_time.strftime("%Y-%m-%d %H:%M:%S"), self.user.username,
             opera_text,
             abs(self.number))
+
+
+class UserCourse(BaseModel):
+    """用户的课程"""
+    user = models.ForeignKey(User, related_name='user_courses', on_delete=models.CASCADE, db_constraint=False, verbose_name="用户")
+    course = models.ForeignKey(Course, related_name='course_users', on_delete=models.CASCADE, db_constraint=False, verbose_name="课程名称")
+    chapter = models.ForeignKey(CourseChapter, related_name='user_chapter', on_delete=models.CASCADE, db_constraint=False, verbose_name="章节信息")
+    lesson = models.ForeignKey(CourseLesson, related_name='user_lesson', on_delete=models.CASCADE, db_constraint=False, verbose_name="课时信息")
+    study_time = models.IntegerField(default=0, verbose_name="学习时长")
+
+    class Meta:
+        db_table = 'ol_user_course'
+        verbose_name = '用户课程购买记录'
+        verbose_name_plural = verbose_name

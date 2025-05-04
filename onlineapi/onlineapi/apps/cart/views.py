@@ -7,6 +7,7 @@ from django_redis import get_redis_connection
 from redis.exceptions import RedisError
 
 from courses.models import Course
+from users.models import UserCourse
 
 
 # Create your views here.
@@ -27,6 +28,12 @@ class CartAPIView(APIView):
             course = Course.objects.get(pk=course_id, is_show=True, is_deleted=False)
         except:
             return Response({"message": "当前课程不存在！"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            # 判断用户是否已经买了
+            UserCourse.objects.get(user_id=user_id, course_id=course_id)
+            return Response({"message": "对不起，您已经购买过当前课程！不需要重新购买！"}, status=status.HTTP_400_BAD_REQUEST)
+        except UserCourse.DoesNotExist:
+            pass
 
         # 3.添加商品到购物车
         redis = get_redis_connection("cart")
