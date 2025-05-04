@@ -164,3 +164,26 @@ class OrderModelSerializer(serializers.ModelSerializer):
                 transaction.savepoint_rollback(t1)
                 # 3. 抛出异常，通知视图返回错误提示
                 raise serializers.ValidationError(detail="订单创建失败！")
+
+
+class OrderDetailModelSerializer(serializers.ModelSerializer):
+    """订单详情序列化器"""
+    course_id = serializers.IntegerField(source="course.id")
+    course_name = serializers.CharField(source="course.name")
+    course_cover = serializers.CharField(source="course.course_cover")
+
+    class Meta:
+        model = OrderDetail
+        fields = ["id", "price", "real_price", "discount_name", "course_id", "course_name", "course_cover"]
+
+
+class OrderListModelSerializer(serializers.ModelSerializer):
+    """订单列表序列化器"""
+    order_courses = OrderDetailModelSerializer(many=True)
+
+    class Meta:
+        model = Order
+        fields = ["id", "order_number", "total_price", "real_price", "pay_time", "created_time", "credit", "coupon",
+                  "pay_type", "order_status", "order_courses"]
+
+

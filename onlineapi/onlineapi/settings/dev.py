@@ -440,7 +440,7 @@ SIMPLEUI_LOGO = '/uploads/logo.svg'
 # 快速操作
 SIMPLEUI_HOME_QUICK = True
 # 服务器信息
-SIMPLEUI_HOME_INFO = True
+SIMPLEUI_HOME_INFO = False
 
 # 关闭simpleui内置的使用分析
 SIMPLEUI_ANALYSIS = False

@@ -39,6 +39,28 @@ const routes = [
     path: '/user',
     name: "User",
     component: ()=> import("../views/User.vue"),
+    children: [
+        {
+          meta:{
+            title: "在线教育-个人信息",
+            keepAlive: true,
+            authorization: true,
+          },
+          path: '',
+          name: "UserInfo",
+          component: ()=> import("../components/user/Info.vue"),
+        },
+        {
+          meta:{
+            title: "在线教育--我的订单",
+            keepAlive: true,
+            authorization: true,
+          },
+          path: 'order',
+          name: "UserOrder",
+          component: ()=> import("../components/user/Order.vue"),
+        },
+      ]
   },
   {
     meta:{
@@ -84,7 +106,10 @@ const routes = [
       path: '/alipay',
       name: "PaySuccess",
       component: ()=> import("../views/AliPaySuccess.vue"),
-    }
+    },
+    {
+
+    },
 
 ]
 
