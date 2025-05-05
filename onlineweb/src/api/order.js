@@ -81,7 +81,15 @@ const order = reactive({
                 Authorization: `Bearer ${token}`
             }
         })
-    }
+  },
+  order_cancel(order_id,token){
+    // 取消订单操作
+    return http.put(`/orders/${order_id}/`, {},{
+        headers:{
+            Authorization: `Bearer ${token}`
+        }
+    })
+  }
 })
 
 export default order;

@@ -102,8 +102,8 @@ getOrderStatus()
 
 const getOrderList = ()=>{
     // 获取当前登录用户的订单列表
-    let token = sessionStorage.token || localStorage.token;
-    order.get_order_list(token).then(response=>{
+    let access = sessionStorage.access || localStorage.access;
+    order.get_order_list(access).then(response=>{
     order.order_list = response.data.results
     order.count = response.data.count
   })
@@ -112,9 +112,36 @@ getOrderList()
 
 let pay_now = (order_info)=>{
   // 订单继续支付
+   order.order_number = order_info.order_number;
+  let access = sessionStorage.access || localStorage.access;
+  if (order.pay_type === 0) {
+    // 如果当前订单的支付方式属于支付宝，发起支付宝支付
+    order.alipay_page_pay(order_info.order_number, access).then(response => {
+      // 新开浏览器窗口，跳转到支付页面
+      window.open(response.data.link, "_blank");
+      // 新建定时器，每隔5秒到服务端查询一次当前订单的支付结果
+      let max_query_timer = 180;
+      clearInterval(order.timer);
+      order.timer = setInterval(() => {
+          max_query_timer--;
+          if(max_query_timer > 0){
+            order.query_order(access).then(response => {
+                order_info.order_status = 1;
+                clearInterval(order.timer);
+            })
+          }else{
+            clearInterval(order.timer);
+          }
+      }, 5000);
+    })
+  }
 }
-let pay_cancel = (order_info)=>{
+let pay_cancel = (order_info)=> {
   // 取消订单
+  let access = sessionStorage.access || localStorage.access;
+  order.order_cancel(order_info.id, access).then(response => {
+    order_info.order_status = 2;
+  })
 }
 
 let evaluate_now = (order_info)=>{
