@@ -7,6 +7,7 @@ from django.db import transaction
 
 from .models import Order, OrderDetail, Course
 from coupon.models import CouponLog
+from .tasks import order_timeout
 
 logger = logging.getLogger("django")
 
@@ -154,6 +155,8 @@ class OrderModelSerializer(serializers.ModelSerializer):
                     redis = get_redis_connection("coupon")
                     redis.delete(f"{user_id}:{user_coupon_id}")
 
+                # 将来订单状态发生改变，再修改优惠券的使用状态，如果订单过期，则再次还原优惠券到redis中
+                order_timeout.apply_async(kwargs={"order_id": order.id}, countdown=constants.ORDER_TIMEOUT)
                 # 返回订单超时时间
                 order.order_timeout = constants.ORDER_TIMEOUT
                 return order

@@ -37,7 +37,7 @@ class AliPaySDK(AliPay):
             "alipay.trade.page.pay",
             biz_content={
                 "out_trade_no": order_number,  # 订单号
-                "total_amount": real_price,  # 订单金额
+                "total_amount": float(real_price),  # 订单金额
                 "subject": order_name,  # 订单标题
                 "product_code": "FAST_INSTANT_TRADE_PAY"  # 支付类型
             },

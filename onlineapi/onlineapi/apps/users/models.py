@@ -83,9 +83,11 @@ class UserCourse(BaseModel):
     """用户的课程"""
     user = models.ForeignKey(User, related_name='user_courses', on_delete=models.CASCADE, db_constraint=False, verbose_name="用户")
     course = models.ForeignKey(Course, related_name='course_users', on_delete=models.CASCADE, db_constraint=False, verbose_name="课程名称")
-    chapter = models.ForeignKey(CourseChapter, related_name='user_chapter', on_delete=models.CASCADE, db_constraint=False, verbose_name="章节信息")
-    lesson = models.ForeignKey(CourseLesson, related_name='user_lesson', on_delete=models.CASCADE, db_constraint=False, verbose_name="课时信息")
-    study_time = models.IntegerField(default=0, verbose_name="学习时长")
+    chapter = models.ForeignKey(CourseChapter, related_name='user_chapter', on_delete=models.CASCADE,
+                                db_constraint=False, verbose_name="章节信息", null=True, blank=True)
+    lesson = models.ForeignKey(CourseLesson, related_name='user_lesson', on_delete=models.CASCADE,
+                               db_constraint=False, verbose_name="课时信息", null=True, blank=True)
+    study_time = models.IntegerField(default=0, verbose_name="学习时长", null=True, blank=True)
 
     class Meta:
         db_table = 'ol_user_course'

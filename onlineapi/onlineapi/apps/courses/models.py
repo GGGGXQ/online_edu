@@ -63,7 +63,7 @@ class Course(BaseModel):
         'thumb_108x61': (108, 61, True),  # 小图(第三个参数表示保持图片质量),
     }, max_length=255, delete_orphans=True, upload_to="course/cover", null=True, verbose_name="封面图片", blank=True, storage=OssMediaStorage())
     course_video = models.FileField(upload_to="course/video", max_length=255, verbose_name="课程视频", blank=True,
-                                    null=True)
+                                    null=True, storage=OssMediaStorage())
     course_type = models.SmallIntegerField(choices=course_type, default=0, verbose_name="付费类型")
     level = models.SmallIntegerField(choices=level_choices, default=1, verbose_name="难度等级")
     description = RichTextField(blank=True, null=True, verbose_name="详情介绍")

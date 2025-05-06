@@ -78,7 +78,7 @@ class AlipayAPIViewSet(ViewSet):
             return Response({"message": "订单不存在!"}, status=status.HTTP_400_BAD_REQUEST)
 
         # 获取当前订单相关的课程信息，用于返回客户端
-        order_courses = order.order_courses.all()
+        order_courses = order.order_course.all()
         courses_list = [item.course for item in order_courses]
 
         if order.order_status == 0:
