@@ -1,11 +1,16 @@
-import re, constants
+import constants
+import re
+import logging
 from rest_framework import serializers
 
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
-from .models import User
+from .models import User, UserCourse
 from tencentcloudapi import TencentCloudAPI, TencentCloudSDKException
 
 from django_redis import get_redis_connection
+
+
+logger = logging.getLogger("django")
 
 
 class UserRegisterModelSerializer(serializers.ModelSerializer):
@@ -90,9 +95,48 @@ class UserRegisterModelSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        # 新增JWT令牌生成逻辑
-        from authenticate import CustomTokenObtainPairSerializer
-        custom_token = CustomTokenObtainPairSerializer()
-        token_data = custom_token.generate_jwt_tokens(instance)
-        data.update(token_data)
+
+        try:
+            # 避免循环依赖的动态导入（若存在循环依赖问题）
+            from authenticate import CustomTokenObtainPairSerializer
+            custom_token = CustomTokenObtainPairSerializer()
+
+            # 生成JWT令牌（修正方法名，假设使用标准 get_token）
+            token_pair = custom_token.get_token(instance)
+            token_data = {
+                'access_token': str(token_pair.access),
+                'refresh_token': str(token_pair),
+            }
+            data.update(token_data)
+        except (ImportError, AttributeError) as e:
+            logger.error(f"JWT Token generation failed: {str(e)}", exc_info=True)
+            raise serializers.ValidationError("Failed to generate authentication tokens")
+        except Exception as e:
+            logger.critical(f"Unexpected error in JWT generation: {str(e)}", exc_info=True)
+            raise serializers.ValidationError("Internal server error")
+
         return data
+
+
+class UserCourseModelSerializer(serializers.ModelSerializer):
+    """用户课程信息序列化器"""
+    course_cover = serializers.ImageField(source="course.course_cover")
+    course_name = serializers.CharField(source="course.name")
+    chapter_name = serializers.CharField(source="chapter.name", default="")
+    chapter_id = serializers.IntegerField(source="chapter.id", default=0)
+    chapter_orders = serializers.IntegerField(source="chapter.orders", default=0)
+    lesson_id = serializers.IntegerField(source="lesson.id", default=0)
+    lesson_name = serializers.CharField(source="lesson.name", default="")
+    lesson_orders = serializers.IntegerField(source="lesson.orders", default=0)
+    course_type = serializers.IntegerField(source="course.course_type", default=0)
+    get_course_type_display = serializers.CharField(source="course.get_course_type_display",default="")
+
+    class Meta:
+        model = UserCourse
+        fields = [
+            "course_id", "course_cover",  "course_name", "study_time",
+            "chapter_id", "chapter_orders", "chapter_name",
+            "lesson_id", "lesson_orders", "lesson_name",
+            "course_type", "get_course_type_display", "progress",
+            "note", "qa", "code"
+        ]

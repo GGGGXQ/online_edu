@@ -1,17 +1,20 @@
-from django.shortcuts import render
+from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.exceptions import InvalidToken
 from rest_framework.views import APIView, Response, status
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView
 # from tencentcloud.common.exception import TencentCloudSDKException
 from django.core.exceptions import ObjectDoesNotExist
 
 from authenticate import CustomTokenObtainPairSerializer
 # from tencentcloudapi import TencentCloudAPI
 
-from .models import User
-from .serializers import UserRegisterModelSerializer
+from .models import User, UserCourse
+from .serializers import UserRegisterModelSerializer, UserCourseModelSerializer
 from .tasks import send_sms
+
+from courses.paginations import CourseListPageNumberPagination
+from courses.models import Course
 
 # 短信模块
 import random
@@ -110,3 +113,19 @@ class SMSAPIView(APIView):
         pipe.execute()  # 提交事务，同时把暂存在pipeline的数据一次性提交给redis
 
         return Response({"errmsg": "OK"}, status=status.HTTP_200_OK)
+
+
+class CourseListAPIView(ListAPIView):
+    """当前用户的课程列表信息"""
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserCourseModelSerializer
+    pagination_class = CourseListPageNumberPagination
+
+    def get_queryset(self):
+        user = self.request.user
+        query = UserCourse.objects.filter(user=user)
+        course_type = int(self.request.query_params.get("type", -1))
+        course_type_list = [item[0] for item in Course.COURSE_TYPE]
+        if course_type in course_type_list:
+            query = query.filter(course__course_type=course_type)
+        return query.order_by("-id").all()

@@ -60,6 +60,15 @@ const routes = [
           name: "UserOrder",
           component: ()=> import("../components/user/Order.vue"),
         },
+        {
+          meta:{
+            title: "在线教育-我的课程",
+            keepAlive: true
+          },
+          path: 'course',
+          name: "UserCourse",
+          component: ()=> import("../components/user/Course.vue"),
+        },
       ]
   },
   {
@@ -106,9 +115,6 @@ const routes = [
       path: '/alipay',
       name: "PaySuccess",
       component: ()=> import("../views/AliPaySuccess.vue"),
-    },
-    {
-
     },
 
 ]
