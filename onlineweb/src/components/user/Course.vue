@@ -75,8 +75,8 @@ get_course_type_list()
 
 // 获取用户的课程列表
 const get_course_list = ()=>{
-  let token = sessionStorage.token || localStorage.token;
-  course.get_user_course_list(token).then(response=>{
+  let access = sessionStorage.access || localStorage.access;
+  course.get_user_course_list(access).then(response=>{
     course.user_course_list = response.data.results; // 我的课程列表
     course.user_course_count = response.data.count   // 我的课程总数
   })

@@ -146,6 +146,28 @@ const course = reactive({
                 Authorization: `Bearer ${token}`
             }
         })
+    },
+    get_lesson_study_time(lesson, token){
+        // 获取课程课时学习进度时间
+        return http.get("/users/lesson/", {
+            params:{
+                lesson,
+            },
+            headers:{
+                Authorization: `Bearer ${token}`
+            }
+        })
+    },
+    update_user_study_progress(lesson, seed, token) {
+        // 更新课时学习的进度
+        return http.post('/users/progress/', {
+            time: seed,
+            lesson: lesson,
+        },{
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
     }
 })
 

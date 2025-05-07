@@ -209,9 +209,9 @@ const onPlaying = (event)=>{
 
 // 添加商品到购物车
 let add_cart = ()=>{
-  let token = sessionStorage.access || localStorage.access
+  let access = sessionStorage.access || localStorage.access
   // 详情页中添加商品到购物车，不用传递参数，直接使用state.course来获取课程信息
-  cart.add_course_to_cart(course.course_id, token).then(response=>{
+  cart.add_course_to_cart(course.course_id, access).then(response=>{
     store.commit("cart_total", response.data.cart_total)
     ElMessage.success(response.data.errmsg)
   }).catch(error=>{

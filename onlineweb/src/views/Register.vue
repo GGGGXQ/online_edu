@@ -104,7 +104,7 @@ const registerhandler = (res)=> {
     // }
 
     // 默认不需要记住登录
-    sessionStorage.token = response.data.access;
+    sessionStorage.access = response.data.access;
 
     // vuex 存储用户登录信息，保存token, 并根据用户的选择，是否记住密码
     console.log(response.data)

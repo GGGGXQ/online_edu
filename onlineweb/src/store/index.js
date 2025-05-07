@@ -17,16 +17,16 @@ export default createStore({
             if(state.user.exp === undefined) {
                 // 没登录
                 state.user = {}
-                localStorage.token = null;
-                sessionStorage.token = null;
+                localStorage.access = null;
+                sessionStorage.access = null;
                 return null
             }
 
             if(parseInt(state.user.exp) < now) {
                 // 过期处理
                 state.user = {}
-                localStorage.token = null;
-                sessionStorage.token = null;
+                localStorage.access = null;
+                sessionStorage.access = null;
                 return null
             }
             return state.user;
@@ -38,8 +38,8 @@ export default createStore({
         },
         logout(state){ // 退出登录
             state.user = {}
-            localStorage.token = null;
-            sessionStorage.token = null;
+            localStorage.access = null;
+            sessionStorage.access = null;
         },
         cart_total(state, total) {
             // 设置商品数量的总数
