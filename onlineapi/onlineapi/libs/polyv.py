@@ -10,59 +10,56 @@ class PolyvPlayer(object):
         self.secretKey = secretkey
         self.tokenUrl = tokenUrl
 
-    def tomd5(self, value):
-        """取md5值"""
-        return hashlib.md5(value.encode()).hexdigest()
+    def tomd5(self, text):
+        """计算字符串的MD5"""
+        md5 = hashlib.md5()
+        md5.update(text.encode('utf-8'))
+        return md5.hexdigest()
 
     # 获取播放加密视频数据的token
     def get_video_token(self, videoId, viewerIp, viewerId=None, viewerName='', extraParams='HTML5'):
         """
-        :param videoId: 视频id
-        :param viewerId: 看视频用户id
-        :param viewerIp: 看视频用户ip
-        :param viewerName: 看视频用户昵称
-        :param extraParams: 扩展参数
-        :param sign: 加密的sign
-        :return: 返回点播的视频的token
+        生成保利威视频播放token
+        :param videoId: 视频ID
+        :param viewerIp: 观看者IP
+        :param viewerId: 观看者ID（可选）
+        :param viewerName: 观看者昵称（可选）
+        :param extraParams: 扩展参数（默认HTML5）
+        :return: 视频播放token
         """
         ts = int(time.time() * 1000)  # 时间戳
+
+        # 构建基础参数字典 - 将None值转换为空字符串
         plain = {
             "userId": self.userId,
-            'videoId': videoId,
-            'ts': ts,
-            'viewerId': viewerId,
-            'viewerIp': viewerIp,
-            'viewerName': viewerName,
-            'extraParams': extraParams
+            "videoId": videoId,
+            "ts": ts,
+            "viewerId": str(viewerId) if viewerId is not None else "",  # 强制转换
+            "viewerIp": viewerIp,
+            "viewerName": str(viewerName),  # 确保字符串
+            "extraParams": str(extraParams)  # 确保字符串
         }
 
-        # 按照ASCKII升序 key + value + key + value... + value 拼接
-        plain_sorted = {}
+        # 按ASCII升序排列并构建字符串
         key_temp = sorted(plain)
-        for key in key_temp:
-            plain_sorted[key] = plain[key]
-        print(plain_sorted)
+        plain_string = ''.join([f"{k}{plain[k]}" for k in key_temp])
 
-        plain_string = ''
-        for k, v in plain_sorted.items():
-            plain_string += str(k) + str(v)
-        print(plain_string)
-
-        # 首尾拼接上秘钥
-        sign_data = self.secretKey + plain_string + self.secretKey
-
-        # 取sign_data的md5的大写
+        # 首尾拼接秘钥并计算MD5
+        sign_data = f"{self.secretKey}{plain_string}{self.secretKey}"
         sign = self.tomd5(sign_data).upper()
 
-        # 新的带有sign的字典
-        plain.update({'sign': sign})
-        # python 提供的发送http请求的模块  requests.get
-        result = requests.post(
-            url=self.tokenUrl,
-            headers={"Content-type": "application/x-www-form-urlencoded"},
-            data=plain
-        ).json()
+        # 添加签名并发送请求
+        plain["sign"] = sign
 
-        ret = {} if isinstance(result, str) else result.get("data", {})
-
-        return ret["token"]
+        try:
+            response = requests.post(
+                url=self.tokenUrl,
+                headers={"Content-type": "application/x-www-form-urlencoded"},
+                data=plain
+            )
+            response.raise_for_status()  # 抛出HTTP错误
+            result = response.json()
+            return result.get("data", {}).get("token", "")
+        except (requests.HTTPError, ValueError) as e:
+            print(f"请求失败: {str(e)}")
+            return ""

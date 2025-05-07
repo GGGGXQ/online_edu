@@ -492,6 +492,6 @@ POLYV = {
     "writeToken": "f686081a-73d0-4989-aff4-25426b3b5128",
     "readToken": "27502dda-e64e-48cb-9b50-d847843b76c0",
     "secretkey": os.getenv("POLYV_SECRETKEY"),
-    "tokenUrl": "https://hls.videocc.net/service/v1/token",
+    "tokenUrl": "http://hls.videocc.net/service/v1/token",
 
 }

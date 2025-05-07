@@ -79,7 +79,7 @@ const node_click = (data)=>{
 }
 
 let polyv = (vid)=>{
-    let access = sessionStorage.access || localStorage.access;
+    let token = sessionStorage.access || localStorage.access;
     // 1. 到数据库中查询用户购买的课程，是否有当前章节
     // let vid = "705f4d7a89533388239620bc7cefe834_7";
     // 2. 到数据库中查询当前用户购买的课程是否在有效期内
@@ -110,9 +110,12 @@ let polyv = (vid)=>{
 
     // 设置自动播放，但是谷歌浏览器会拦截自动播放
     try {
-        course.player.j2s_resumeVideo();
-    } catch (error){
-
+      // 设置静音可以绕过部分浏览器的自动播放限制
+      course.player.j2s_setVolume(0);
+      course.player.j2s_resumeVideo();
+    } catch (error) {
+      console.error('自动播放失败，请用户手动播放', error);
+      // 显示一个播放按钮提示用户点击播放
     }
 
     let video = document.querySelector(".pv-video")
