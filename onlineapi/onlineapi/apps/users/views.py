@@ -2,7 +2,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.exceptions import InvalidToken
 from rest_framework.views import APIView, Response, status
-from rest_framework.generics import CreateAPIView, ListAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, GenericAPIView
 # from tencentcloud.common.exception import TencentCloudSDKException
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -129,3 +129,41 @@ class CourseListAPIView(ListAPIView):
         if course_type in course_type_list:
             query = query.filter(course__course_type=course_type)
         return query.order_by("-id").all()
+
+
+class UserCourseAPIView(GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserCourseModelSerializer
+
+    def get(self,request,course_id):
+        """获取用户在当前课程的学习进度"""
+        user = request.user
+        try:
+            user_course = UserCourse.objects.get(user=user, course=course_id)
+        except UserCourse.DoesNotExist:
+            return Response({"error": "当前课程您尚未购买！"}, status=status.HTTP_400_BAD_REQUEST)
+
+        chapter_id = user_course.chapter_id
+        print(f"chapter_id={chapter_id}")
+        if chapter_id:
+            """曾经学习过本课程"""
+            lesson = user_course.lesson
+        else:
+            """从未学习当前课程"""
+            # 获取当前课程第1个章节
+            chapter = user_course.course.chapter_list.order_by("orders").first()
+            # 获取当前章节第1个课时
+            lesson = chapter.lesson_list.order_by("orders").first()
+            # 保存本次学习起始进度
+            user_course.chapter = chapter
+            user_course.lesson = lesson
+            user_course.save()
+
+        serializer = self.get_serializer(user_course)
+        data = serializer.data
+        # 获取当前课时的课时类型和课时链接
+        data["lesson_type"] = lesson.lesson_type
+        data["lesson_link"] = lesson.lesson_link
+
+        return Response(data)
+

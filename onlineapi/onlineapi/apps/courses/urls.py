@@ -14,5 +14,6 @@ urlpatterns = [
     path("hot_word/", views.HotWordAPIView.as_view()),
     re_path(r"^(?P<pk>\d+)/$", views.CourseRetrieveAPIView.as_view()),
     re_path(r"^(?P<course>\d+)/chapters/$", views.CourseChapterListAPIView.as_view()),
-    path("type/", views.CourseTypeListAPIView.as_view())
+    path("type/", views.CourseTypeListAPIView.as_view()),
+    re_path(r"^polyv/token/(?P<vid>\w+)/$", views.PolyvViewSet.as_view({"get": "token"})),
 ] + router.urls

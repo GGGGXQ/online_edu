@@ -484,3 +484,14 @@ ALIPAY = {
     "return_url": "http://www.onlineedu.cn:5173/alipay",  # 同步回调结果通知地址
     "notify_url": "http://www.onlineedu.cn:5173/payments/alipay/notify",  # 异步回调结果通知地址
 }
+
+
+# 保利威视频加密服务
+POLYV = {
+    "userId": "79f0c32114",
+    "writeToken": "f686081a-73d0-4989-aff4-25426b3b5128",
+    "readToken": "27502dda-e64e-48cb-9b50-d847843b76c0",
+    "secretkey": os.getenv("POLYV_SECRETKEY"),
+    "tokenUrl": "https://hls.videocc.net/service/v1/token",
+
+}

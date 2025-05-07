@@ -1,8 +1,11 @@
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.views import APIView
+from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework.filters import OrderingFilter
+from rest_framework.permissions import IsAuthenticated
 from django_redis import get_redis_connection
+from django.conf import settings
 
 from drf_haystack.viewsets import HaystackViewSet
 from drf_haystack.filters import HaystackFilter
@@ -11,6 +14,9 @@ from .models import CourseDirection, CourseCategory, Course, CourseChapter
 from .serializers import CourseDirectionModelSerializer, CourseCategoryModelSerializer, CourseInfoModelSerializer
 from .serializers import CourseIndexHaystackSerializer, CourseRetrieveModelSerializer, CourseChapterModelSerializer
 from .paginations import CourseListPageNumberPagination
+
+from onlineapi.libs.polyv import PolyvPlayer
+
 import constants
 from datetime import datetime, timedelta
 
@@ -135,3 +141,23 @@ class CourseTypeListAPIView(APIView):
     """课程类型"""
     def get(self, request):
         return Response(Course.COURSE_TYPE)
+
+
+class PolyvViewSet(ViewSet):
+    """保利威云视频服务相关的API接口"""
+    permission_classes = [IsAuthenticated]
+
+    def token(self, request, vid):
+        """获取视频播放的授权令牌token"""
+        userId = settings.POLYV["userId"]
+        secretkey = settings.POLYV["secretkey"]
+        tokenUrl = settings.POLYV["tokenUrl"]
+        polyv = PolyvPlayer(userId, secretkey, tokenUrl)
+
+        user_ip = request.META.get("REMOTE_ADDR")  # 客户端的IP地址
+        user_id = request.user.id  # 用户ID
+        user_name = request.user.username  # 用户名
+
+        token = polyv.get_video_token(vid, user_ip, user_id, user_name)
+
+        return Response({"token": token})
